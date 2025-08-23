@@ -7,10 +7,10 @@ import (
 )
 
 type TelemetryEvent struct {
-	EventID         string      `json:"event_id"`
-	SimulationRunID uuid.UUID   `json:"simulation_run_id"`
-	Timestamp       time.Time   `json:"timestamp"`
-	EventType       string      `json:"event_type"` 
+	EventID         string    `json:"event_id"`
+	SimulationRunID uuid.UUID `json:"simulation_run_id"`
+	Timestamp       time.Time `json:"timestamp"`
+	EventType       string    `json:"event_type"`
 
 	VehicleID    *string        `json:"vehicle_id,omitempty"`
 	CellX        *int64         `json:"cell_x,omitempty"`
@@ -41,8 +41,20 @@ type VehicleState struct {
 }
 
 type RoadLoadEvent struct {
-	SegmentID        int64 `json:"segment_id"`
-	FleetCount       int   `json:"fleet_count"`
-	BackgroundCount  int   `json:"background_count"`
-	Capacity         int   `json:"capacity"`
+	SegmentID       int64 `json:"segment_id"`
+	FleetCount      int   `json:"fleet_count"`
+	BackgroundCount int   `json:"background_count"`
+	Capacity        int   `json:"capacity"`
+}
+
+type RoutingDecisionEvent struct {
+	EventID         string    `json:"event_id"`
+	SimulationRunID uuid.UUID `json:"simulation_run_id"`
+	Timestamp       time.Time `json:"timestamp"`
+
+	VehicleID    string `json:"vehicle_id"`
+	FromSegment  int64  `json:"from_segment"`
+	ToSegment    int64  `json:"to_segment"`
+	DecisionType string `json:"decision_type"`
+	Reason       string `json:"reason,omitempty"`
 }

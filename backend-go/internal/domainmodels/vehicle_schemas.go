@@ -25,19 +25,16 @@ type VehicleDB struct {
 	VehicleProfileID int64      `db:"vehicle_profile_id"`
 	Status           string     `db:"status"`
 
-	
-	CurrentCellID *int64 `db:"current_cell_id"`    // FK -> cells.id
-	CurrentSegID  *int64 `db:"current_segment_id"` // FK -> road_segments.id
-	EdgeProgress  float64 `db:"edge_progress"`    
+	CurrentCellID *int64  `db:"current_cell_id"`    // FK -> cells.id
+	CurrentSegID  *int64  `db:"current_segment_id"` // FK -> road_segments.id
+	EdgeProgress  float64 `db:"edge_progress"`
 
-	
 	OriginCellID      *int64 `db:"origin_cell_id"`      // FK -> cells.id
 	DestinationCellID *int64 `db:"destination_cell_id"` // FK -> cells.id
 
-	
-	CurrentSpeedKPH float64   `db:"current_speed_kph"`
-	FuelLevel       float64   `db:"fuel_level"`
-	ProximityLOD    bool      `db:"proximity_lod"`
+	CurrentSpeedKPH float64 `db:"current_speed_kph"`
+	FuelLevel       float64 `db:"fuel_level"`
+	ProximityLOD    bool    `db:"proximity_lod"`
 
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
