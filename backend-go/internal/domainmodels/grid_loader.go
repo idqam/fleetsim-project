@@ -107,8 +107,8 @@ func (gl *GridLoader) ConfigureForTesting(
 }
 
 func PrettyPrint(v any) {
-    b, _ := json.MarshalIndent(v, "", "  ")
-    fmt.Println(string(b))
+	b, _ := json.MarshalIndent(v, "", "  ")
+	fmt.Println(string(b))
 }
 
 func NewGridLoader() *GridLoader {
@@ -131,7 +131,6 @@ func (e *GridParseError) Error() string {
 	return fmt.Sprintf("[GridParseError]: %s", e.Details)
 }
 
-
 func (gl *GridLoader) validateImportedGrid(grid *Grid) error {
 	if grid.DimX <= 0 || grid.DimY <= 0 {
 		return fmt.Errorf("invalid grid dimensions: %dx%d (must be positive)", grid.DimX, grid.DimY)
@@ -145,25 +144,23 @@ func (gl *GridLoader) validateImportedGrid(grid *Grid) error {
 
 	coordinatesSeen := make(map[[2]int64]bool)
 	for i, cell := range grid.Cells {
-		
+
 		if cell.Xpos < 0 || cell.Xpos >= grid.DimX ||
 			cell.Ypos < 0 || cell.Ypos >= grid.DimY {
 			return fmt.Errorf("cell %d has coordinates (%d,%d) outside grid bounds %dx%d",
 				i, cell.Xpos, cell.Ypos, grid.DimX, grid.DimY)
 		}
 
-		
 		coords := [2]int64{cell.Xpos, cell.Ypos}
 		if coordinatesSeen[coords] {
 			return fmt.Errorf("duplicate cell coordinates (%d,%d) found", cell.Xpos, cell.Ypos)
 		}
 		coordinatesSeen[coords] = true
 
-		
 		switch cell.CellType {
 		case CellTypeNormal, CellTypeRefuel,
 			CellTypeDepot, CellTypeBlocked:
-		
+
 		default:
 			return fmt.Errorf("cell %d has invalid cell type: %s", i, cell.CellType)
 		}
@@ -172,7 +169,6 @@ func (gl *GridLoader) validateImportedGrid(grid *Grid) error {
 			return fmt.Errorf("refuel station at (%d,%d) missing refuel amount", cell.Xpos, cell.Ypos)
 		}
 
-		
 		for j, cellRoad := range cell.RoadSegments {
 			segment := cellRoad.RoadSegment
 			if segment.ID <= 0 {
@@ -180,7 +176,6 @@ func (gl *GridLoader) validateImportedGrid(grid *Grid) error {
 					cell.Xpos, cell.Ypos, j, segment.ID)
 			}
 
-			
 			if !gl.isValidSegmentForCell(segment, cell) {
 				return fmt.Errorf("cell (%d,%d) contains segment %d with invalid coordinates",
 					cell.Xpos, cell.Ypos, segment.ID)
@@ -188,7 +183,6 @@ func (gl *GridLoader) validateImportedGrid(grid *Grid) error {
 		}
 	}
 
-	
 	if err := gl.validateRoadConnectivity(grid); err != nil {
 		return fmt.Errorf("road connectivity validation failed: %w", err)
 	}
@@ -198,17 +192,15 @@ func (gl *GridLoader) validateImportedGrid(grid *Grid) error {
 
 func (gl *GridLoader) isValidSegmentForCell(segment RoadSegment, cell Cell) bool {
 
-
 	cellX, cellY := cell.Xpos, cell.Ypos
 	startX, startY := segment.StartX, segment.StartY
 	endX, endY := segment.EndX, segment.EndY
 
-	
 	if (startX == cellX && startY == cellY) || (endX == cellX && endY == cellY) {
 		return true
 	}
 
-	if startX == endX { 
+	if startX == endX {
 		if cellX == startX {
 			minY, maxY := startY, endY
 			if minY > maxY {
@@ -216,7 +208,7 @@ func (gl *GridLoader) isValidSegmentForCell(segment RoadSegment, cell Cell) bool
 			}
 			return cellY >= minY && cellY <= maxY
 		}
-	} else if startY == endY { 
+	} else if startY == endY {
 		if cellY == startY {
 			minX, maxX := startX, endX
 			if minX > maxX {
@@ -257,7 +249,6 @@ func (gl *GridLoader) validateRoadConnectivity(grid *Grid) error {
 		}
 	}
 
-	
 	if componentCount > 1 {
 		return fmt.Errorf("road network has %d isolated components (should be 1 for full connectivity)", componentCount)
 	}
@@ -290,9 +281,9 @@ func (gl *GridLoader) findConnectedSegments(target RoadSegment, grid *Grid) []in
 }
 
 func (gl *GridLoader) BFSMarkConnected(segmentID int64, adjacency map[int64][]int64, explored map[int64]bool) {
-	size :=  len(adjacency)
+	size := len(adjacency)
 	queue := utils.NewIntQueue(size)
-	
+
 	explored[segmentID] = true
 	queue.Enqueue(segmentID)
 	for !queue.IsEmpty() {
@@ -309,12 +300,12 @@ func (gl *GridLoader) BFSMarkConnected(segmentID int64, adjacency map[int64][]in
 // func (gl *GridLoader) dfsMarkConnected(segmentID int64, adjacency map[int64][]int64, visited map[int64]bool) {
 // 	visited[segmentID] = true
 
-// 	for _, connectedID := range adjacency[segmentID] {
-// 		if !visited[connectedID] {
-// 			gl.dfsMarkConnected(connectedID, adjacency, visited)
-// 		}
-// 	}
-// }
+//		for _, connectedID := range adjacency[segmentID] {
+//			if !visited[connectedID] {
+//				gl.dfsMarkConnected(connectedID, adjacency, visited)
+//			}
+//		}
+//	}
 func (gl *GridLoader) countRoadSegments(grid *Grid) int {
 	segmentsSeen := make(map[int64]bool)
 
@@ -349,7 +340,7 @@ func (gl *GridLoader) analyzeGenerationResults(grid *Grid) {
 	// will be added as we implement the road generation algorithms
 }
 
-//TO USE LATER
+// TO USE LATER
 func (gl *GridLoader) logGenerationStats() {
 	stats := gl.GenerationStatsSu
 	if stats == nil {

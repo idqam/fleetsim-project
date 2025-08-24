@@ -1,7 +1,5 @@
 package utils
 
-
-
 type IntQueue struct {
 	data     []int64
 	head     int
@@ -9,7 +7,6 @@ type IntQueue struct {
 	size     int
 	capacity int
 }
-
 
 func NewIntQueue(capacity int) *IntQueue {
 	return &IntQueue{

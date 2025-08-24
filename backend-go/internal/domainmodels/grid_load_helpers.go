@@ -7,8 +7,6 @@ import (
 	"time"
 )
 
-
-
 func (gl *GridLoader) buildSpatialIndexes(grid *Grid) {
 	fmt.Printf("Building spatial indexes for %d cells...\n", len(grid.Cells))
 
@@ -86,40 +84,5 @@ func (gl *GridLoader) LoadFromJSON(filepath string) (*Grid, error) {
 	fmt.Printf("Grid contains %d cells with %d road segments\n",
 		gl.GenerationStatsSu.TotalCells, gl.GenerationStatsSu.TotalSegments)
 
-	
-return &grid, nil
-}
-
-//TEST FUNCTION NOT REAL GEN LOGIC
-
-func (gl *GridLoader) GenerateRandomTestGrid() *Grid {
-    grid := &Grid{
-        DimX:  gl.Width,
-        DimY:  gl.Height,
-        Cells: make([]Cell, 0),
-    }
-
-    idCounter := int64(1)
-    for x := int64(0); x < gl.Width; x++ {
-        for y := int64(0); y < gl.Height; y++ {
-            cell := Cell{Xpos: x, Ypos: y, CellType: CellTypeNormal}
-
-            if y%3 == 0 {
-                seg := RoadSegment{
-                    ID:     idCounter,
-                    StartX: x, StartY: y,
-                    EndX:   x + 1, EndY: y,
-                }
-                cell.RoadSegments = append(cell.RoadSegments, CellRoad{
-                    RoadSegmentID: seg.ID,
-                    RoadSegment:   seg,
-                })
-                idCounter++
-            }
-
-            grid.Cells = append(grid.Cells, cell)
-        }
-    }
-
-    return grid
+	return &grid, nil
 }
