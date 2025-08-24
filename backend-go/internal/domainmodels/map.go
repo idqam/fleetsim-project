@@ -26,19 +26,7 @@ type CellRoad struct {
 	RoadSegment   RoadSegment `json:"road_segment"`
 }
 
-type RoadSegment struct {
-	ID     int64 `json:"id"`
-	StartX int64 `json:"start_x"`
-	StartY int64 `json:"start_y"`
-	EndX   int64 `json:"end_x"`
-	EndY   int64 `json:"end_y"`
 
-	// Optional attributes
-	SpeedLimit        *int64   `json:"speed_limit,omitempty"`
-	Capacity          *int64   `json:"capacity,omitempty"`
-	WeatherConditions []string `json:"weather_conditions,omitempty"`
-	IsOpen            bool     `json:"is_open"`
-}
 type RoadGraph struct {
 	Adjacency map[int64][]int64
 }
