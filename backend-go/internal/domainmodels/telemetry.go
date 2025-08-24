@@ -6,14 +6,12 @@ import (
 	"github.com/google/uuid"
 )
 
-
 type TelemetryEvent struct {
 	EventID         string    `json:"event_id"`
 	SimulationRunID uuid.UUID `json:"simulation_run_id"`
 	Timestamp       time.Time `json:"timestamp"`
 	EventType       string    `json:"event_type"`
 
-	
 	VehicleID    *string        `json:"vehicle_id,omitempty"`
 	CellX        *int64         `json:"cell_x,omitempty"`
 	CellY        *int64         `json:"cell_y,omitempty"`
@@ -27,15 +25,15 @@ type TelemetryEvent struct {
 	FleetCount      *int   `json:"fleet_count,omitempty"`
 	BackgroundCount *int   `json:"background_count,omitempty"`
 	Capacity        *int   `json:"capacity,omitempty"`
-	
-	UserSessionID    *string `json:"user_session_id,omitempty"`
-	SpawnRequestID   *string `json:"spawn_request_id,omitempty"`
-	UserAction       *string `json:"user_action,omitempty"`        
-	ActionResult     *string `json:"action_result,omitempty"`      
-	
-	ConditionID      *string  `json:"condition_id,omitempty"`
-	ConditionChange  *string  `json:"condition_change,omitempty"`  
-	SpeedMultiplier  *float64 `json:"speed_multiplier,omitempty"`
+
+	UserSessionID  *string `json:"user_session_id,omitempty"`
+	SpawnRequestID *string `json:"spawn_request_id,omitempty"`
+	UserAction     *string `json:"user_action,omitempty"`
+	ActionResult   *string `json:"action_result,omitempty"`
+
+	ConditionID     *string  `json:"condition_id,omitempty"`
+	ConditionChange *string  `json:"condition_change,omitempty"`
+	SpeedMultiplier *float64 `json:"speed_multiplier,omitempty"`
 }
 type VehicleState struct {
 	VehicleID     string        `json:"vehicle_id"`

@@ -15,7 +15,7 @@ type CellDB struct {
 	GridID       int64     `db:"grid_id"`
 	Xpos         int64     `db:"xpos"`
 	Ypos         int64     `db:"ypos"`
-	CellType     string    `db:"cell_type"`     // normal, refuel, depot, blocked
+	CellType     string    `db:"cell_type"`     
 	RefuelAmount *float64  `db:"refuel_amount"` // nullable
 	CreatedAt    time.Time `db:"created_at"`
 	UpdatedAt    time.Time `db:"updated_at"`

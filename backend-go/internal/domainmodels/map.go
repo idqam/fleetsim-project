@@ -4,6 +4,10 @@ type Grid struct {
 	DimX  int64  `json:"dimX"`
 	DimY  int64  `json:"dimY"`
 	Cells []Cell `json:"cells"`
+
+	CoordIndex   map[[2]int64]*Cell `json:"-"` // (x,y) → *Cell
+	SegmentIndex map[int64]*Cell    `json:"-"` // segmentID → *Cell
+	RoadGraph    *RoadGraph         `json:"-"` // adjacency of road network
 }
 type CellType string
 
@@ -25,7 +29,6 @@ type CellRoad struct {
 	RoadSegmentID int64       `json:"road_segment_id"`
 	RoadSegment   RoadSegment `json:"road_segment"`
 }
-
 
 type RoadGraph struct {
 	Adjacency map[int64][]int64

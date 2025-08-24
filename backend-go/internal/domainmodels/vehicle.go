@@ -24,20 +24,18 @@ const (
 type VehicleStatus string
 
 const (
-	VehicleStatusRequested VehicleStatus = "requested"  
-	VehicleStatusQueued    VehicleStatus = "queued"     
-	VehicleStatusSpawning  VehicleStatus = "spawning"   
-	
-	
+	VehicleStatusRequested VehicleStatus = "requested"
+	VehicleStatusQueued    VehicleStatus = "queued"
+	VehicleStatusSpawning  VehicleStatus = "spawning"
+
 	VehicleStatusMoving    VehicleStatus = "moving"
 	VehicleStatusIdle      VehicleStatus = "idle"
 	VehicleStatusStopped   VehicleStatus = "stopped"
 	VehicleStatusRefueling VehicleStatus = "refueling"
-	
-	
-	VehicleStatusCompleted VehicleStatus = "completed"  
-	VehicleStatusRemoved   VehicleStatus = "removed"    
-	VehicleStatusFailed    VehicleStatus = "failed"     
+
+	VehicleStatusCompleted VehicleStatus = "completed"
+	VehicleStatusRemoved   VehicleStatus = "removed"
+	VehicleStatusFailed    VehicleStatus = "failed"
 )
 
 type VehicleProfile struct {
@@ -57,41 +55,35 @@ type Vehicle struct {
 	Profile VehicleProfile `json:"profile"`
 	Status  VehicleStatus  `json:"status"`
 
+	SpawnRequestID *string    `json:"spawn_request_id,omitempty"`
+	UserSessionID  *string    `json:"user_session_id,omitempty"`
+	CustomName     *string    `json:"custom_name,omitempty"`
+	SpawnedAt      *time.Time `json:"spawned_at,omitempty"`
 
-	SpawnRequestID   *string    `json:"spawn_request_id,omitempty"`   
-	UserSessionID    *string    `json:"user_session_id,omitempty"`    
-	CustomName       *string    `json:"custom_name,omitempty"`        
-	SpawnedAt        *time.Time `json:"spawned_at,omitempty"`         
-	
-	
 	CurrentCell     *Cell        `json:"current_cell,omitempty"`
 	CurrentRoad     *RoadSegment `json:"current_road,omitempty"`
 	Progress        float64      `json:"progress"`
 	CurrentSpeedKPH float64      `json:"current_speed_kph"`
-	PlannedPath     []int64      `json:"planned_path,omitempty"`     
-	NextDecisionAt  int64        `json:"next_decision_at,omitempty"` 
+	PlannedPath     []int64      `json:"planned_path,omitempty"`
+	NextDecisionAt  int64        `json:"next_decision_at,omitempty"`
 
-	
-	OriginCell      *Cell              `json:"origin_cell,omitempty"`
-	DestinationCell *Cell              `json:"destination_cell,omitempty"`
-	SpawnIntent     *UserSpawnIntent   `json:"spawn_intent,omitempty"`     
+	OriginCell      *Cell            `json:"origin_cell,omitempty"`
+	DestinationCell *Cell            `json:"destination_cell,omitempty"`
+	SpawnIntent     *UserSpawnIntent `json:"spawn_intent,omitempty"`
 
-	
-	FuelLevel           float64            `json:"fuel_level"`
-	InitialFuelPercent  *float64           `json:"initial_fuel_percent,omitempty"` 
-	SpeedMultiplier     float64            `json:"speed_multiplier"`
-	ProximityLOD        bool               `json:"proximity_lod"`
+	FuelLevel          float64  `json:"fuel_level"`
+	InitialFuelPercent *float64 `json:"initial_fuel_percent,omitempty"`
+	SpeedMultiplier    float64  `json:"speed_multiplier"`
+	ProximityLOD       bool     `json:"proximity_lod"`
 
-	
-	LastDecisionAt      int64              `json:"last_decision_at,omitempty"`
-	FailureReason       *string            `json:"failure_reason,omitempty"`     
+	LastDecisionAt int64   `json:"last_decision_at,omitempty"`
+	FailureReason  *string `json:"failure_reason,omitempty"`
 }
 
-
 type UserSpawnIntent struct {
-	RequestedVehicleType    VehicleType `json:"requested_vehicle_type"`
-	RequestedSpawnLocation  string      `json:"requested_spawn_location"` 
-	RequestedDestination    string      `json:"requested_destination"`    
-	RequestedFuelPercent    *float64    `json:"requested_fuel_percent,omitempty"`
-	UserNotes              *string     `json:"user_notes,omitempty"`      
+	RequestedVehicleType   VehicleType `json:"requested_vehicle_type"`
+	RequestedSpawnLocation string      `json:"requested_spawn_location"`
+	RequestedDestination   string      `json:"requested_destination"`
+	RequestedFuelPercent   *float64    `json:"requested_fuel_percent,omitempty"`
+	UserNotes              *string     `json:"user_notes,omitempty"`
 }
