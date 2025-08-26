@@ -4,44 +4,15 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"owenvi.com/fleetsim/internal/constants"
 )
 
-type VehicleType string
 
-const (
-	VehicleTypeTruck VehicleType = "truck"
-	VehicleTypeVan   VehicleType = "van"
-	VehicleTypeCar   VehicleType = "car"
-)
-
-type VehicleClass string
-
-const (
-	VehicleClassFleet      VehicleClass = "fleet"
-	VehicleClassBackground VehicleClass = "background"
-)
-
-type VehicleStatus string
-
-const (
-	VehicleStatusRequested VehicleStatus = "requested"
-	VehicleStatusQueued    VehicleStatus = "queued"
-	VehicleStatusSpawning  VehicleStatus = "spawning"
-
-	VehicleStatusMoving    VehicleStatus = "moving"
-	VehicleStatusIdle      VehicleStatus = "idle"
-	VehicleStatusStopped   VehicleStatus = "stopped"
-	VehicleStatusRefueling VehicleStatus = "refueling"
-
-	VehicleStatusCompleted VehicleStatus = "completed"
-	VehicleStatusRemoved   VehicleStatus = "removed"
-	VehicleStatusFailed    VehicleStatus = "failed"
-)
 
 type VehicleProfile struct {
 	ID                int64       `json:"id"`
 	Name              string      `json:"name"`
-	VehicleType       VehicleType `json:"vehicle_type"`
+	VehicleType       constants.VehicleType `json:"vehicle_type"`
 	TankLiters        float64     `json:"tank_liters"`
 	ConsumptionL100KM float64     `json:"consumption_l_per_100km"`
 	MaxSpeedKPH       int         `json:"max_speed_kph"`
@@ -50,10 +21,10 @@ type VehicleProfile struct {
 
 type Vehicle struct {
 	ID      string         `json:"id"`
-	Class   VehicleClass   `json:"class"`
+	Class   constants.VehicleClass   `json:"class"`
 	FleetID *uuid.UUID     `json:"fleet_id,omitempty"`
 	Profile VehicleProfile `json:"profile"`
-	Status  VehicleStatus  `json:"status"`
+	Status  constants.VehicleStatus  `json:"status"`
 
 	SpawnRequestID *string    `json:"spawn_request_id,omitempty"`
 	UserSessionID  *string    `json:"user_session_id,omitempty"`
@@ -81,7 +52,7 @@ type Vehicle struct {
 }
 
 type UserSpawnIntent struct {
-	RequestedVehicleType   VehicleType `json:"requested_vehicle_type"`
+	RequestedVehicleType   constants.VehicleType `json:"requested_vehicle_type"`
 	RequestedSpawnLocation string      `json:"requested_spawn_location"`
 	RequestedDestination   string      `json:"requested_destination"`
 	RequestedFuelPercent   *float64    `json:"requested_fuel_percent,omitempty"`

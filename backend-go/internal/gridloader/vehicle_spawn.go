@@ -5,7 +5,9 @@ import (
 	"math/rand"
 
 	"owenvi.com/fleetsim/internal/config"
+	"owenvi.com/fleetsim/internal/constants"
 	"owenvi.com/fleetsim/internal/domainmodels"
+	"owenvi.com/fleetsim/internal/utils"
 
 	"time"
 )
@@ -46,7 +48,7 @@ func (vs *VehicleSpawner) initializeVehicleProfiles() {
 	carProfile := &domainmodels.VehicleProfile{
 		ID:                1,
 		Name:              "Standard Car",
-		VehicleType:       domainmodels.VehicleTypeCar,
+		VehicleType:       constants.VehicleTypeCar,
 		TankLiters:        60.0,  
 		ConsumptionL100KM: 8.0,   
 		MaxSpeedKPH:       120,   
@@ -57,7 +59,7 @@ func (vs *VehicleSpawner) initializeVehicleProfiles() {
 	vanProfile := &domainmodels.VehicleProfile{
 		ID:                2,
 		Name:              "Delivery Van",
-		VehicleType:       domainmodels.VehicleTypeVan,
+		VehicleType:       constants.VehicleTypeVan,
 		TankLiters:        80.0,  
 		ConsumptionL100KM: 12.0,  
 		MaxSpeedKPH:       100,   
@@ -69,7 +71,7 @@ func (vs *VehicleSpawner) initializeVehicleProfiles() {
 	truckProfile := &domainmodels.VehicleProfile{
 		ID:                3,
 		Name:              "Heavy Truck",
-		VehicleType:       domainmodels.VehicleTypeTruck,
+		VehicleType:       constants.VehicleTypeTruck,
 		TankLiters:        200.0,
 		ConsumptionL100KM: 25.0, 
 		MaxSpeedKPH:       80,   
@@ -162,7 +164,7 @@ func (vs *VehicleSpawner) isSuitableSpawnLocation(grid *domainmodels.Grid, cell 
 	
 	if cell.CellType == domainmodels.CellTypeNormal {
 		
-		connectionCount := vs.countCellConnections(grid, cell)
+		connectionCount := utils.CountCellConnections(grid, cell)
 		return connectionCount >= 1 
 	}
 	
@@ -173,25 +175,6 @@ func (vs *VehicleSpawner) isSuitableSpawnLocation(grid *domainmodels.Grid, cell 
 	return false
 }
 
-func (vs *VehicleSpawner) countCellConnections(grid *domainmodels.Grid, cell *domainmodels.Cell) int {
-	uniqueConnections := make(map[string]bool)
-	
-	for _, cellRoad := range cell.RoadSegments {
-		segment := cellRoad.RoadSegment
-		
-		if segment.StartX == cell.Xpos && segment.StartY == cell.Ypos {
-			direction := vs.getConnectionDirection(segment.EndX-segment.StartX, segment.EndY-segment.StartY)
-			uniqueConnections[direction] = true
-		}
-		
-		if segment.EndX == cell.Xpos && segment.EndY == cell.Ypos {
-			direction := vs.getConnectionDirection(segment.StartX-segment.EndX, segment.StartY-segment.EndY)
-			uniqueConnections[direction] = true
-		}
-	}
-	
-	return len(uniqueConnections)
-}
 
 func (vs *VehicleSpawner) getConnectionDirection(dx, dy int64) string {
 	if dx > 0 {
@@ -240,9 +223,9 @@ func (vs *VehicleSpawner) createVehicle(vehicleType string, spawnLocation *domai
 
 	vehicle := domainmodels.Vehicle{
 		ID:      vehicleID,
-		Class:   domainmodels.VehicleClassFleet, 
+		Class:   constants.VehicleClassFleet, 
 		Profile: *profile,
-		Status:  domainmodels.VehicleStatusIdle, 
+		Status:  constants.VehicleStatusIdle, 
 		
 		
 		CurrentCell:     spawnLocation,
@@ -282,7 +265,7 @@ func (vs *VehicleSpawner) selectRandomDestination(grid *domainmodels.Grid, origi
 			continue
 		}
 		
-		distance := vs.manhattanDistance(origin.Xpos, origin.Ypos, cell.Xpos, cell.Ypos)
+		distance := utils.ManhattanDistance(origin.Xpos, origin.Ypos, cell.Xpos, cell.Ypos)
 		if distance < minDistance {
 			continue
 		}
@@ -318,17 +301,6 @@ func (vs *VehicleSpawner) selectRandomDestination(grid *domainmodels.Grid, origi
 	return nil 
 }
 
-func (vs *VehicleSpawner) manhattanDistance(x1, y1, x2, y2 int64) int64 {
-	dx := x1 - x2
-	if dx < 0 {
-		dx = -dx
-	}
-	dy := y1 - y2
-	if dy < 0 {
-		dy = -dy
-	}
-	return dx + dy
-}
 
 func (vs *VehicleSpawner) GetSpawnedVehicles() []domainmodels.Vehicle {
 	return vs.spawnedVehicles

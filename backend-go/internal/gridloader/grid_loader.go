@@ -230,7 +230,7 @@ func (gl *GridLoader) validateRoadConnectivity(grid *domainmodels.Grid) error {
 			segment := cellRoad.RoadSegment
 			allSegments[segment.ID] = true
 
-			connections := gl.findConnectedSegments(segment, grid)
+			connections := utils.FindConnectedSegments(segment, grid)
 			adjacency[segment.ID] = connections
 		}
 	}
@@ -246,7 +246,7 @@ func (gl *GridLoader) validateRoadConnectivity(grid *domainmodels.Grid) error {
 	for segmentID := range allSegments {
 		if !visited[segmentID] {
 			componentCount++
-			gl.BFSMarkConnected(segmentID, adjacency, visited)
+			utils.BFSMarkConnected(segmentID, adjacency, visited)
 		}
 	}
 
@@ -256,47 +256,7 @@ func (gl *GridLoader) validateRoadConnectivity(grid *domainmodels.Grid) error {
 
 	return nil
 }
-func (gl *GridLoader) findConnectedSegments(target domainmodels.RoadSegment, grid *domainmodels.Grid) []int64 {
-	var connections []int64
 
-	targetStartX, targetStartY := target.StartX, target.StartY
-	targetEndX, targetEndY := target.EndX, target.EndY
-
-	for _, cell := range grid.Cells {
-		for _, cellRoad := range cell.RoadSegments {
-			other := cellRoad.RoadSegment
-			if other.ID == target.ID {
-				continue
-			}
-
-			if (other.StartX == targetStartX && other.StartY == targetStartY) ||
-				(other.StartX == targetEndX && other.StartY == targetEndY) ||
-				(other.EndX == targetStartX && other.EndY == targetStartY) ||
-				(other.EndX == targetEndX && other.EndY == targetEndY) {
-				connections = append(connections, other.ID)
-			}
-		}
-	}
-
-	return connections
-}
-
-func (gl *GridLoader) BFSMarkConnected(segmentID int64, adjacency map[int64][]int64, explored map[int64]bool) {
-	size := len(adjacency)
-	queue := utils.NewIntQueue(size)
-
-	explored[segmentID] = true
-	queue.Enqueue(segmentID)
-	for !queue.IsEmpty() {
-		currSeg := queue.Dequeue()
-		for _, neighbor := range adjacency[currSeg] {
-			if !explored[neighbor] {
-				explored[neighbor] = true
-				queue.Enqueue(neighbor)
-			}
-		}
-	}
-}
 
 func (gl *GridLoader) countRoadSegments(grid *domainmodels.Grid) int {
 	segmentsSeen := make(map[int64]bool)

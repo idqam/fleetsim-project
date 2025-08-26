@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"owenvi.com/fleetsim/internal/domainmodels"
+	"owenvi.com/fleetsim/internal/utils"
 )
 
 func (gl *GridLoader) validateAndRepairConnectivity(grid *domainmodels.Grid) error {
@@ -47,7 +48,7 @@ func (gl *GridLoader) findConnectedComponents(grid *domainmodels.Grid) [][]int64
 			allSegments[segment.ID] = true
 			
 			
-			connections := gl.findConnectedSegments(segment, grid)
+			connections := utils.FindConnectedSegments(segment, grid)
 			adjacency[segment.ID] = connections
 		}
 	}
@@ -65,24 +66,12 @@ func (gl *GridLoader) findConnectedComponents(grid *domainmodels.Grid) [][]int64
 		if !visited[segmentID] {
 			
 			component := []int64{}
-			gl.dfsCollectComponent(segmentID, adjacency, visited, &component)
+			utils.DfsCollectComponent(segmentID, adjacency, visited, &component)
 			components = append(components, component)
 		}
 	}
 	
 	return components
-}
-
-func (gl *GridLoader) dfsCollectComponent(segmentID int64, adjacency map[int64][]int64, visited map[int64]bool, component *[]int64) {
-	visited[segmentID] = true
-	*component = append(*component, segmentID)
-	
-	
-	for _, connectedID := range adjacency[segmentID] {
-		if !visited[connectedID] {
-			gl.dfsCollectComponent(connectedID, adjacency, visited, component)
-		}
-	}
 }
 
 
@@ -148,7 +137,7 @@ func (gl *GridLoader) findBestBridgeConnection(grid *domainmodels.Grid, componen
 	
 	for _, cellA := range cellsA {
 		for _, cellB := range cellsB {
-			distance := gl.manhattanDistance(cellA.Xpos, cellA.Ypos, cellB.Xpos, cellB.Ypos)
+			distance := utils.ManhattanDistance(cellA.Xpos, cellA.Ypos, cellB.Xpos, cellB.Ypos)
 		
 			if distance == 1 && distance < shortestDistance {
 				connection := &BridgeConnection{
@@ -199,8 +188,8 @@ func (gl *GridLoader) getSegmentCells(grid *domainmodels.Grid, segmentIDs []int6
 }
 
 func (gl *GridLoader) isValidBridgeConnection(grid *domainmodels.Grid, connection *BridgeConnection) bool {
-	fromCell := gl.getCellAt(grid, connection.FromX, connection.FromY)
-	toCell := gl.getCellAt(grid, connection.ToX, connection.ToY)
+	fromCell := gl.getCellAtGrid(grid, connection.FromX, connection.FromY)
+	toCell := gl.getCellAtGrid(grid, connection.ToX, connection.ToY)
 	
 	if fromCell == nil || toCell == nil {
 		return false

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"owenvi.com/fleetsim/internal/constants"
 )
 
 type TelemetryEvent struct {
@@ -19,7 +20,7 @@ type TelemetryEvent struct {
 	FuelLevel    *float64       `json:"fuel_level,omitempty"`
 	CurrentSegID *int64         `json:"current_segment_id,omitempty"`
 	EdgeProgress *float64       `json:"edge_progress,omitempty"`
-	Status       *VehicleStatus `json:"status,omitempty"`
+	Status       *constants.VehicleStatus `json:"status,omitempty"`
 
 	SegmentID       *int64 `json:"segment_id,omitempty"`
 	FleetCount      *int   `json:"fleet_count,omitempty"`
@@ -44,7 +45,7 @@ type VehicleState struct {
 	FuelLevel     float64       `json:"fuel_level"`
 	CurrentSegID  *int64        `json:"current_segment_id"`
 	EdgeProgress  float64       `json:"edge_progress"`
-	Status        VehicleStatus `json:"status"`
+	Status        constants.VehicleStatus `json:"status"`
 	SimulatedTime int64         `json:"simulated_time_ms"`
 }
 

@@ -34,35 +34,8 @@ type SimulationConfig struct {
 	TimescaleRetentionHours   int `json:"timescale_retention_hours"`     
 }
 
-type VehicleSpawnRequest struct {
-	VehicleType        string   `json:"vehicle_type"`
-	InitialFuelPercent *float64 `json:"initial_fuel_percent,omitempty"`
 
-	SpawnLocation *SpawnLocationRequest `json:"spawn_location,omitempty"`
-	Destination   *DestinationRequest   `json:"destination,omitempty"`
 
-	CustomSpeedMultiplier *float64 `json:"custom_speed_multiplier,omitempty"`
-	VehicleName           *string  `json:"vehicle_name,omitempty"`
-}
-
-type SpawnLocationRequest struct {
-	LocationType string `json:"location_type"`
-	CellX        *int64 `json:"cell_x,omitempty"`
-	CellY        *int64 `json:"cell_y,omitempty"`
-	
-	PreferEdgeSpawn       bool  `json:"prefer_edge_spawn"`
-	AvoidCongestion       bool  `json:"avoid_congestion"`
-	MinDistanceFromOthers int64 `json:"min_distance_from_others"`
-}
-
-type DestinationRequest struct {
-	DestinationType string `json:"destination_type"`
-	CellX           *int64 `json:"cell_x,omitempty"`
-	CellY           *int64 `json:"cell_y,omitempty"`
-	
-	MaxDistanceFromSpawn *int64 `json:"max_distance_from_spawn,omitempty"`
-	RequireFuelStop      bool   `json:"require_fuel_stop"`
-}
 
 func Config() *SimulationConfig {
 	return &SimulationConfig{

@@ -3,6 +3,7 @@ package gridloader
 import (
 	"fmt"
 
+	"owenvi.com/fleetsim/internal/constants"
 	"owenvi.com/fleetsim/internal/domainmodels"
 )
 
@@ -126,11 +127,11 @@ func (world *DemoWorld) PrintASCIIVisualization() {
 			x, y := vehicle.CurrentCell.Xpos, vehicle.CurrentCell.Ypos
 			
 			switch vehicle.Profile.VehicleType {
-			case domainmodels.VehicleTypeCar:
+			case constants.VehicleTypeCar:
 				display[y][x] = 'c' 
-			case domainmodels.VehicleTypeVan:
+			case constants.VehicleTypeVan:
 				display[y][x] = 'v' 
-			case domainmodels.VehicleTypeTruck:
+			case constants.VehicleTypeTruck:
 				display[y][x] = 't' 
 			}
 		}
@@ -188,11 +189,11 @@ func (world *DemoWorld) PrintDetailedStats() {
 	}
 	
 	// Vehicle statistics
-	vehicleTypeCounts := make(map[domainmodels.VehicleType]int)
+	vehicleTypeCounts := make(map[constants.VehicleType]int)
 	totalFuel := 0.0
 	
 	for _, vehicle := range world.Vehicles {
-		vehicleTypeCounts[vehicle.Profile.VehicleType]++
+		vehicleTypeCounts[constants.VehicleType(vehicle.Profile.VehicleType)]++
 		totalFuel += vehicle.FuelLevel
 	}
 	

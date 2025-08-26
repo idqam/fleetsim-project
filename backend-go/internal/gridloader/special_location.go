@@ -5,6 +5,7 @@ import (
 	"math/rand"
 
 	"owenvi.com/fleetsim/internal/domainmodels"
+	"owenvi.com/fleetsim/internal/utils"
 )
 
 
@@ -75,44 +76,12 @@ func (gl *GridLoader) isCellStrategicallyEligible(grid *domainmodels.Grid, cell 
 		return false
 	}
 
-	connectionCount := gl.countCellConnections(grid, cell)
+	connectionCount := utils.CountCellConnections(grid, cell)
 	return connectionCount >= 2
 
 }
 
 
-func (gl *GridLoader) countCellConnections(grid *domainmodels.Grid, cell *domainmodels.Cell) int {
-	connections := make(map[string]bool)
-	
-	for _, cellRoad := range cell.RoadSegments {
-		segment := cellRoad.RoadSegment
-		
-		if segment.StartX == cell.Xpos && segment.StartY == cell.Ypos {
-
-			direction := gl.getDirectionString(segment.EndX-segment.StartX, segment.EndY-segment.StartY)
-			connections[direction] = true
-		} else if segment.EndX == cell.Xpos && segment.EndY == cell.Ypos {
-			direction := gl.getDirectionString(segment.StartX-segment.EndX, segment.StartY-segment.EndY)
-			connections[direction] = true
-		}
-	}
-	
-	return len(connections)
-}
-
-
-func (gl *GridLoader) getDirectionString(dx, dy int64) string {
-	if dx > 0 {
-		return "east"
-	} else if dx < 0 {
-		return "west"
-	} else if dy > 0 {
-		return "south"
-	} else if dy < 0 {
-		return "north"
-	}
-	return "unknown"
-}
 
 
 func (gl *GridLoader) placeFuelStations(grid *domainmodels.Grid, eligibleCells []*domainmodels.Cell, count int, rng *rand.Rand) error {
@@ -160,7 +129,7 @@ func (gl *GridLoader) hasGoodFuelStationSpacing(grid *domainmodels.Grid, candida
 	minSpacing := int64(4) 
 	for _, cell := range grid.Cells {
 		if cell.CellType == domainmodels.CellTypeRefuel {
-			distance := gl.manhattanDistance(candidate.Xpos, candidate.Ypos, cell.Xpos, cell.Ypos)
+			distance := utils.ManhattanDistance(candidate.Xpos, candidate.Ypos, cell.Xpos, cell.Ypos)
 			if distance < minSpacing {
 				return false 
 			}
@@ -187,7 +156,7 @@ func (gl *GridLoader) placeDepots(grid *domainmodels.Grid, eligibleCells []*doma
 		
 		if candidate.CellType == domainmodels.CellTypeNormal && 
 		   gl.hasGoodDepotSpacing(grid, candidate) &&
-		   gl.countCellConnections(grid, candidate) >= 2 {
+		   utils.CountCellConnections(grid, candidate) >= 2 {
 			
 			candidate.CellType = domainmodels.CellTypeDepot
 			placed++
@@ -211,7 +180,7 @@ func (gl *GridLoader) hasGoodDepotSpacing(grid *domainmodels.Grid, candidate *do
 	
 	for _, cell := range grid.Cells {
 		if cell.CellType == domainmodels.CellTypeDepot {
-			distance := gl.manhattanDistance(candidate.Xpos, candidate.Ypos, cell.Xpos, cell.Ypos)
+			distance := utils.ManhattanDistance(candidate.Xpos, candidate.Ypos, cell.Xpos, cell.Ypos)
 			if distance < minSpacing {
 				return false
 			}
@@ -269,7 +238,7 @@ func (gl *GridLoader) placeBlockedAreas(grid *domainmodels.Grid, eligibleCells [
 
 func (gl *GridLoader) canSafelyBlockCell(grid *domainmodels.Grid, candidate *domainmodels.Cell) bool {
 	
-	connectionCount := gl.countCellConnections(grid, candidate)
+	connectionCount := utils.CountCellConnections(grid, candidate)
 	if connectionCount > 2 {
 		return false
 	}
@@ -277,7 +246,7 @@ func (gl *GridLoader) canSafelyBlockCell(grid *domainmodels.Grid, candidate *dom
 	minDistanceFromSpecial := int64(2)
 	for _, cell := range grid.Cells {
 		if cell.CellType == domainmodels.CellTypeRefuel || cell.CellType == domainmodels.CellTypeDepot {
-			distance := gl.manhattanDistance(candidate.Xpos, candidate.Ypos, cell.Xpos, cell.Ypos)
+			distance := utils.ManhattanDistance(candidate.Xpos, candidate.Ypos, cell.Xpos, cell.Ypos)
 			if distance < minDistanceFromSpecial {
 				return false
 			}
@@ -293,24 +262,13 @@ func (gl *GridLoader) validatePostPlacementConnectivity(grid *domainmodels.Grid)
 }
 
 
-func (gl *GridLoader) manhattanDistance(x1, y1, x2, y2 int64) int64 {
-	dx := x1 - x2
-	if dx < 0 {
-		dx = -dx
-	}
-	dy := y1 - y2
-	if dy < 0 {
-		dy = -dy
-	}
-	return dx + dy
-}
 
 
 func (gl *GridLoader) removeNearbyFromCandidates(candidates []*domainmodels.Cell, placed *domainmodels.Cell, minDistance int64) []*domainmodels.Cell {
 	var filtered []*domainmodels.Cell
 	
 	for _, candidate := range candidates {
-		distance := gl.manhattanDistance(candidate.Xpos, candidate.Ypos, placed.Xpos, placed.Ypos)
+		distance := utils.ManhattanDistance(candidate.Xpos, candidate.Ypos, placed.Xpos, placed.Ypos)
 		if distance >= minDistance {
 			filtered = append(filtered, candidate)
 		}

@@ -1,6 +1,8 @@
 package runtime
 
-import "owenvi.com/fleetsim/internal/domainmodels"
+import (
+	"owenvi.com/fleetsim/internal/domainmodels"
+)
 
 type MoveRequest struct {
 	VehicleID string
