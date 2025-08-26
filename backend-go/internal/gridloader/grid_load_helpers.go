@@ -186,12 +186,17 @@ func (gl *GridLoader) generateRoadNetwork(grid *domainmodels.Grid, rng *rand.Ran
 
 func (gl *GridLoader) createMainArteries(grid *domainmodels.Grid, rng *rand.Rand) int {
 	arteriesCreated := 0
-	max := 15
-	min := 2
-    a := rand.Intn(max-min+1) + min
+
+
+
+	min, max := 2, 20
 
 	b := rand.Intn(max-min+1) + min
-	horizontalArteries := gl.selectMainRoadPositions(gl.Height, a,b, rng)
+
+	
+	a := rand.Intn(max-b+1) + b
+
+	horizontalArteries := gl.selectMainRoadPositions(gl.Height, b,a , rng)
 	for _, y := range horizontalArteries {
 		if gl.createHorizontalRoad(grid, y) {
 			arteriesCreated++
@@ -199,7 +204,7 @@ func (gl *GridLoader) createMainArteries(grid *domainmodels.Grid, rng *rand.Rand
 	}
 	
 
-	verticalArteries := gl.selectMainRoadPositions(gl.Width, a,b, rng)
+	verticalArteries := gl.selectMainRoadPositions(gl.Width,b,a, rng)
 	for _, x := range verticalArteries {
 		if gl.createVerticalRoad(grid, x) {
 			arteriesCreated++
