@@ -1,9 +1,10 @@
-package domainmodels
+package gridloader
 
 import (
 	"encoding/json"
 	"fmt"
 
+	"owenvi.com/fleetsim/internal/domainmodels"
 	"owenvi.com/fleetsim/internal/utils"
 )
 
@@ -131,7 +132,7 @@ func (e *GridParseError) Error() string {
 	return fmt.Sprintf("[GridParseError]: %s", e.Details)
 }
 
-func (gl *GridLoader) validateImportedGrid(grid *Grid) error {
+func (gl *GridLoader) validateImportedGrid(grid *domainmodels.Grid) error {
 	if grid.DimX <= 0 || grid.DimY <= 0 {
 		return fmt.Errorf("invalid grid dimensions: %dx%d (must be positive)", grid.DimX, grid.DimY)
 	}
@@ -158,14 +159,14 @@ func (gl *GridLoader) validateImportedGrid(grid *Grid) error {
 		coordinatesSeen[coords] = true
 
 		switch cell.CellType {
-		case CellTypeNormal, CellTypeRefuel,
-			CellTypeDepot, CellTypeBlocked:
+		case domainmodels.CellTypeNormal, domainmodels.CellTypeRefuel,
+			domainmodels.CellTypeDepot, domainmodels.CellTypeBlocked:
 
 		default:
 			return fmt.Errorf("cell %d has invalid cell type: %s", i, cell.CellType)
 		}
 
-		if cell.CellType == CellTypeRefuel && cell.RefuelAmount == nil {
+		if cell.CellType == domainmodels.CellTypeRefuel && cell.RefuelAmount == nil {
 			return fmt.Errorf("refuel station at (%d,%d) missing refuel amount", cell.Xpos, cell.Ypos)
 		}
 
@@ -190,7 +191,7 @@ func (gl *GridLoader) validateImportedGrid(grid *Grid) error {
 	return nil
 }
 
-func (gl *GridLoader) isValidSegmentForCell(segment RoadSegment, cell Cell) bool {
+func (gl *GridLoader) isValidSegmentForCell(segment domainmodels.RoadSegment, cell domainmodels.Cell) bool {
 
 	cellX, cellY := cell.Xpos, cell.Ypos
 	startX, startY := segment.StartX, segment.StartY
@@ -220,7 +221,7 @@ func (gl *GridLoader) isValidSegmentForCell(segment RoadSegment, cell Cell) bool
 
 	return false
 }
-func (gl *GridLoader) validateRoadConnectivity(grid *Grid) error {
+func (gl *GridLoader) validateRoadConnectivity(grid *domainmodels.Grid) error {
 	adjacency := make(map[int64][]int64)
 	allSegments := make(map[int64]bool)
 
@@ -255,7 +256,7 @@ func (gl *GridLoader) validateRoadConnectivity(grid *Grid) error {
 
 	return nil
 }
-func (gl *GridLoader) findConnectedSegments(target RoadSegment, grid *Grid) []int64 {
+func (gl *GridLoader) findConnectedSegments(target domainmodels.RoadSegment, grid *domainmodels.Grid) []int64 {
 	var connections []int64
 
 	targetStartX, targetStartY := target.StartX, target.StartY
@@ -297,16 +298,7 @@ func (gl *GridLoader) BFSMarkConnected(segmentID int64, adjacency map[int64][]in
 	}
 }
 
-// func (gl *GridLoader) dfsMarkConnected(segmentID int64, adjacency map[int64][]int64, visited map[int64]bool) {
-// 	visited[segmentID] = true
-
-//		for _, connectedID := range adjacency[segmentID] {
-//			if !visited[connectedID] {
-//				gl.dfsMarkConnected(connectedID, adjacency, visited)
-//			}
-//		}
-//	}
-func (gl *GridLoader) countRoadSegments(grid *Grid) int {
+func (gl *GridLoader) countRoadSegments(grid *domainmodels.Grid) int {
 	segmentsSeen := make(map[int64]bool)
 
 	for _, cell := range grid.Cells {
@@ -318,7 +310,7 @@ func (gl *GridLoader) countRoadSegments(grid *Grid) int {
 	return len(segmentsSeen)
 }
 
-func (gl *GridLoader) analyzeGenerationResults(grid *Grid) {
+func (gl *GridLoader) analyzeGenerationResults(grid *domainmodels.Grid) {
 	roadCells := 0
 	specialCells := 0
 
@@ -327,7 +319,7 @@ func (gl *GridLoader) analyzeGenerationResults(grid *Grid) {
 			roadCells++
 		}
 
-		if cell.CellType != CellTypeNormal {
+		if cell.CellType != domainmodels.CellTypeNormal {
 			specialCells++
 		}
 	}
