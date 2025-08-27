@@ -36,7 +36,7 @@ type VehicleSpawnPayload struct {
 
 type VehicleSpawnRequest struct {
 	RequestID     string                       `json:"request_id"`
-	UserSessionID string                       `json:"user_session_id"`
+	// UserSessionID string                       `json:"user_session_id"`
 	Status        constants.SpawnRequestStatus `json:"status"`
 	CreatedAt     time.Time                    `json:"created_at"`
 	ProcessedAt   *time.Time                   `json:"processed_at,omitempty"`

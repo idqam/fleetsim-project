@@ -2,6 +2,7 @@ package gridloader
 
 import (
 	"fmt"
+	"time"
 
 	"owenvi.com/fleetsim/internal/domainmodels"
 	"owenvi.com/fleetsim/internal/utils"
@@ -10,6 +11,7 @@ import (
 func (gl *GridLoader) validateAndRepairConnectivity(grid *domainmodels.Grid) error {
 	fmt.Printf("Validating and repairing network connectivity...\n")
 
+	
 	components := gl.findConnectedComponents(grid)
 
 	if len(components) <= 1 {
@@ -21,6 +23,7 @@ func (gl *GridLoader) validateAndRepairConnectivity(grid *domainmodels.Grid) err
 
 	connectionsAdded := gl.connectDisconnectedComponents(grid, components)
 
+	
 	componentsAfterRepair := gl.findConnectedComponents(grid)
 
 	if len(componentsAfterRepair) > 1 {
@@ -33,16 +36,29 @@ func (gl *GridLoader) validateAndRepairConnectivity(grid *domainmodels.Grid) err
 }
 
 func (gl *GridLoader) findConnectedComponents(grid *domainmodels.Grid) [][]int64 {
+	
+	var endpointIndex utils.EndpointIndex
+	if gl.endpointIndex != nil {
+		endpointIndex = gl.endpointIndex
+	} else {
+		endpointIndex = utils.BuildEndpointIndex(grid)
+	}
 
 	adjacency := make(map[int64][]int64)
 	allSegments := make(map[int64]bool)
+	processedSegments := make(map[int64]bool) 
 
 	for _, cell := range grid.Cells {
 		for _, cellRoad := range cell.RoadSegments {
 			segment := cellRoad.RoadSegment
 			allSegments[segment.ID] = true
 
-			connections := utils.FindConnectedSegments(segment, grid)
+			if processedSegments[segment.ID] {
+				continue
+			}
+			processedSegments[segment.ID] = true
+
+			connections := utils.FindConnectedSegmentsFast(segment, endpointIndex)
 			adjacency[segment.ID] = connections
 		}
 	}
@@ -56,7 +72,6 @@ func (gl *GridLoader) findConnectedComponents(grid *domainmodels.Grid) [][]int64
 
 	for segmentID := range allSegments {
 		if !visited[segmentID] {
-
 			component := []int64{}
 			utils.DfsCollectComponent(segmentID, adjacency, visited, &component)
 			components = append(components, component)
@@ -65,7 +80,6 @@ func (gl *GridLoader) findConnectedComponents(grid *domainmodels.Grid) [][]int64
 
 	return components
 }
-
 func (gl *GridLoader) connectDisconnectedComponents(grid *domainmodels.Grid, components [][]int64) int {
 	if len(components) <= 1 {
 		return 0
@@ -245,26 +259,50 @@ func (gl *GridLoader) validateConnectedAccessibility(grid *domainmodels.Grid) er
 }
 
 func (gl *GridLoader) generateConnectivityReport(grid *domainmodels.Grid) *ConnectivityReport {
+	startTime := time.Now()
+	
+	
 	components := gl.findConnectedComponents(grid)
+	
+	analysisTime := time.Since(startTime)
 
 	report := &ConnectivityReport{
 		TotalSegments:       gl.countRoadSegments(grid),
 		ConnectedComponents: len(components),
 		IsFullyConnected:    len(components) <= 1,
 		ComponentSizes:      make([]int, len(components)),
+		AnalysisTimeMs:      float64(analysisTime.Milliseconds()), // Add this field
 	}
 
 	for i, component := range components {
 		report.ComponentSizes[i] = len(component)
 	}
 
+	
 	for _, cell := range grid.Cells {
 		switch cell.CellType {
 		case domainmodels.CellTypeRefuel:
-			report.AccessibleFuelStations++
+			if len(cell.RoadSegments) > 0 {
+				report.AccessibleFuelStations++
+			}
 		case domainmodels.CellTypeDepot:
-			report.AccessibleDepots++
+			if len(cell.RoadSegments) > 0 {
+				report.AccessibleDepots++
+			}
 		}
+	}
+
+	
+	if report.TotalSegments > 0 {
+		totalConnections := 0
+		if grid.RoadGraph != nil {
+			for _, connections := range grid.RoadGraph.Adjacency {
+				totalConnections += len(connections)
+			}
+		}
+		
+		report.NetworkDensity = float64(totalConnections) / float64(report.TotalSegments*2) 
+		report.AverageConnectivity = float64(totalConnections) / float64(report.TotalSegments)
 	}
 
 	return report
@@ -279,4 +317,5 @@ type ConnectivityReport struct {
 	AccessibleDepots       int     `json:"accessible_depots"`
 	NetworkDensity         float64 `json:"network_density"`
 	AverageConnectivity    float64 `json:"average_connectivity"`
+	AnalysisTimeMs float64`json:"analysis_time_ms"`
 }

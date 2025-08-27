@@ -25,6 +25,7 @@ type GridLoader struct {
 
 	SegmentIDCounter  int64
 	GenerationStatsSu *GenerationStats
+	endpointIndex utils.EndpointIndex
 }
 
 type GenerationStats struct {
@@ -224,15 +225,29 @@ func (gl *GridLoader) isValidSegmentForCell(segment domainmodels.RoadSegment, ce
 	return false
 }
 func (gl *GridLoader) validateRoadConnectivity(grid *domainmodels.Grid) error {
+	var endpointIndex utils.EndpointIndex
+	if gl.endpointIndex != nil {
+		endpointIndex = gl.endpointIndex
+	} else {
+		endpointIndex = utils.BuildEndpointIndex(grid)
+	}
+
 	adjacency := make(map[int64][]int64)
 	allSegments := make(map[int64]bool)
+	processedSegments := make(map[int64]bool)
 
 	for _, cell := range grid.Cells {
 		for _, cellRoad := range cell.RoadSegments {
 			segment := cellRoad.RoadSegment
 			allSegments[segment.ID] = true
 
-			connections := utils.FindConnectedSegments(segment, grid)
+			if processedSegments[segment.ID] {
+				continue
+			}
+			processedSegments[segment.ID] = true
+
+			
+			connections := utils.FindConnectedSegmentsFast(segment, endpointIndex)
 			adjacency[segment.ID] = connections
 		}
 	}
@@ -241,7 +256,7 @@ func (gl *GridLoader) validateRoadConnectivity(grid *domainmodels.Grid) error {
 		return nil
 	}
 
-	//bfs search
+	
 	visited := make(map[int64]bool)
 	componentCount := 0
 
@@ -313,4 +328,20 @@ func (gl *GridLoader) logGenerationStats() {
 	fmt.Printf("Total road segments: %d\n", stats.TotalSegments)
 	fmt.Printf("Generation time: %d ms\n", stats.GenerationTimeMs)
 	fmt.Printf("=====================================\n\n")
+}
+
+
+func (gl *GridLoader) useRealisticRoadConnections(grid *domainmodels.Grid) {
+	fmt.Println("Switching to realistic geometric road connections...")
+	geometricAdjacency := gl.buildGeometricAdjacency(grid)
+	grid.RoadGraph = &domainmodels.RoadGraph{Adjacency: geometricAdjacency}
+	fmt.Printf("Updated to geometric adjacency: %d connections\n", 
+		countTotalConnections(geometricAdjacency))
+}
+func countTotalConnections(adjacency map[int64][]int64) int {
+	total := 0
+	for _, connections := range adjacency {
+		total += len(connections)
+	}
+	return total
 }
