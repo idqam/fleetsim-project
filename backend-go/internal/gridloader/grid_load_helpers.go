@@ -12,19 +12,17 @@ import (
 	"owenvi.com/fleetsim/internal/utils"
 )
 
-
 func (gl *GridLoader) buildSpatialIndexes(grid *domainmodels.Grid) {
 	fmt.Printf("Building spatial indexes for %d cells...\n", len(grid.Cells))
-	
+
 	startTime := time.Now()
-	
+
 	grid.CoordIndex = make(map[[2]int64]*domainmodels.Cell)
 	for i := range grid.Cells {
 		cell := &grid.Cells[i]
 		grid.CoordIndex[[2]int64{cell.Xpos, cell.Ypos}] = cell
 	}
-	
-	
+
 	grid.SegmentIndex = make(map[int64]*domainmodels.Cell)
 	for i := range grid.Cells {
 		cell := &grid.Cells[i]
@@ -32,30 +30,27 @@ func (gl *GridLoader) buildSpatialIndexes(grid *domainmodels.Grid) {
 			grid.SegmentIndex[road.RoadSegmentID] = cell
 		}
 	}
-	
+
 	//Geometric
 	gl.endpointIndex = utils.BuildEndpointIndex(grid)
-	
-	//Grid 
+
+	//Grid
 	gridBasedAdjacency := gl.buildGridBasedAdjacencyOptimized(grid)
-	
-	
+
 	geometricAdjacency := gl.buildGeometricAdjacency(grid)
-	
+
 	grid.RoadGraph = &domainmodels.RoadGraph{Adjacency: gridBasedAdjacency}
-	
+
 	indexingTime := time.Since(startTime)
-	
+
 	fmt.Printf("Spatial indexing completed in %v:\n", indexingTime)
 	fmt.Printf("  • %d coordinate mappings\n", len(grid.CoordIndex))
 	fmt.Printf("  • %d road segments indexed\n", len(grid.SegmentIndex))
 	fmt.Printf("  • %d grid-based adjacency entries\n", len(gridBasedAdjacency))
 	fmt.Printf("  • %d geometric adjacency entries\n", len(geometricAdjacency))
-	
-	
+
 	// gl.compareConnectivityMethods(grid, gridBasedAdjacency, geometricAdjacency)
-	
-	
+
 	//gl.endpointIndex.PrintIndexStats()
 }
 
@@ -64,7 +59,7 @@ func (gl *GridLoader) useGeometricAdjacency(grid *domainmodels.Grid) {
 		fmt.Println("Endpoint index not built - cannot switch to geometric adjacency")
 		return
 	}
-	
+
 	fmt.Println("Switching to geometric adjacency...")
 	geometricAdjacency := gl.buildGeometricAdjacency(grid)
 	grid.RoadGraph = &domainmodels.RoadGraph{Adjacency: geometricAdjacency}
@@ -74,11 +69,11 @@ func (gl *GridLoader) buildGridBasedAdjacency(grid *domainmodels.Grid) map[int64
 	adjacency := make(map[int64][]int64)
 	directions := [][2]int64{
 		{0, -1},
-		{0, 1},  
-		{-1, 0}, 
-		{1, 0},  
+		{0, 1},
+		{-1, 0},
+		{1, 0},
 	}
-	
+
 	for _, cell := range grid.Cells {
 		for _, road := range cell.RoadSegments {
 			for _, d := range directions {
@@ -91,28 +86,28 @@ func (gl *GridLoader) buildGridBasedAdjacency(grid *domainmodels.Grid) map[int64
 			}
 		}
 	}
-	
+
 	return adjacency
 }
 
 func (gl *GridLoader) buildGeometricAdjacency(grid *domainmodels.Grid) map[int64][]int64 {
 	adjacency := make(map[int64][]int64)
 	processedSegments := make(map[int64]bool)
-	
+
 	for _, cell := range grid.Cells {
 		for _, road := range cell.RoadSegments {
 			segmentID := road.RoadSegmentID
-			
+
 			if processedSegments[segmentID] {
 				continue
 			}
 			processedSegments[segmentID] = true
-			
+
 			connections := utils.FindConnectedSegmentsFast(road.RoadSegment, gl.endpointIndex)
 			adjacency[segmentID] = connections
 		}
 	}
-	
+
 	return adjacency
 }
 
@@ -120,15 +115,15 @@ func (gl *GridLoader) compareConnectivityMethods(grid *domainmodels.Grid, gridBa
 	if len(gridBased) == 0 || len(geometric) == 0 {
 		return
 	}
-	
+
 	fmt.Printf("\nCONNECTIVITY METHOD COMPARISON\n")
 	fmt.Printf("==============================\n")
-	
+
 	totalGridConnections := 0
 	totalGeometricConnections := 0
 	matchingSegments := 0
 	differingSegments := 0
-	
+
 	allSegments := make(map[int64]bool)
 	for segID := range gridBased {
 		allSegments[segID] = true
@@ -136,46 +131,45 @@ func (gl *GridLoader) compareConnectivityMethods(grid *domainmodels.Grid, gridBa
 	for segID := range geometric {
 		allSegments[segID] = true
 	}
-	
+
 	for segmentID := range allSegments {
 		gridConnections := len(gridBased[segmentID])
 		geometricConnections := len(geometric[segmentID])
-		
+
 		totalGridConnections += gridConnections
 		totalGeometricConnections += geometricConnections
-		
+
 		if gridConnections == geometricConnections {
 			matchingSegments++
 		} else {
 			differingSegments++
 		}
 	}
-	
+
 	fmt.Printf("Grid-based method: %d total connections\n", totalGridConnections)
 	fmt.Printf("Geometric method: %d total connections\n", totalGeometricConnections)
 	fmt.Printf("Segments with matching connection count: %d\n", matchingSegments)
 	fmt.Printf("Segments with differing connection count: %d\n", differingSegments)
-	
+
 	if len(allSegments) > 0 {
 		avgGridConnections := float64(totalGridConnections) / float64(len(allSegments))
 		avgGeometricConnections := float64(totalGeometricConnections) / float64(len(allSegments))
 		fmt.Printf("Average connections per segment (grid): %.1f\n", avgGridConnections)
 		fmt.Printf("Average connections per segment (geometric): %.1f\n", avgGeometricConnections)
 	}
-	
-	
+
 	fmt.Printf("\nExample differences:\n")
 	count := 0
 	for segmentID := range allSegments {
 		if count >= 3 {
 			break
 		}
-		
+
 		gridConns := gridBased[segmentID]
 		geomConns := geometric[segmentID]
-		
+
 		if len(gridConns) != len(geomConns) {
-			fmt.Printf("Segment %d: grid=%d connections, geometric=%d connections\n", 
+			fmt.Printf("Segment %d: grid=%d connections, geometric=%d connections\n",
 				segmentID, len(gridConns), len(geomConns))
 			count++
 		}
@@ -302,7 +296,7 @@ func (gl *GridLoader) placeSpecialLocationsHybrid(grid *domainmodels.Grid, rng *
 	originalRefuel := gl.RefuelCellsAllotment
 	originalDepot := gl.DepotCellsAllotment
 
-	maxAttempts := 3
+	maxAttempts := 10
 
 	for attempt := 0; attempt < maxAttempts; attempt++ {
 		var targetBlocked, targetRefuel, targetDepot float64
@@ -786,10 +780,10 @@ func (gl *GridLoader) addLocalRoadConnections(grid *domainmodels.Grid, cell *dom
 	connectionsAdded := 0
 
 	directions := []struct{ dx, dy int64 }{
-		{0, -1}, 
-		{0, 1},  
-		{1, 0},  
-		{-1, 0}, 
+		{0, -1},
+		{0, 1},
+		{1, 0},
+		{-1, 0},
 	}
 
 	maxConnections := 2 + rng.Intn(3)
@@ -935,74 +929,70 @@ func (gl *GridLoader) getDefaultCapacityForSegment() *int64 {
 	return &capacity
 }
 
-
 func (gl *GridLoader) buildGridBasedAdjacencyOptimized(grid *domainmodels.Grid) map[int64][]int64 {
 	adjacency := make(map[int64][]int64)
-	
+
 	directions := [4][2]int64{
 		{0, -1},
-		{0, 1}, 
+		{0, 1},
 		{-1, 0},
-		{1, 0}, 
+		{1, 0},
 	}
-	
+
 	processedPairs := make(map[string]bool)
-	
+
 	cellSegments := make(map[[2]int64][]int64)
 	for _, cell := range grid.Cells {
 		cellPos := [2]int64{cell.Xpos, cell.Ypos}
 		segments := make([]int64, 0, len(cell.RoadSegments))
-		
+
 		for _, road := range cell.RoadSegments {
 			segments = append(segments, road.RoadSegmentID)
 		}
-		
+
 		if len(segments) > 0 {
 			cellSegments[cellPos] = segments
 		}
 	}
-	
-	
+
 	for cellPos, currentSegments := range cellSegments {
 		currentX, currentY := cellPos[0], cellPos[1]
-		
-		
+
 		for _, direction := range directions {
 			neighborX := currentX + direction[0]
 			neighborY := currentY + direction[1]
 			neighborPos := [2]int64{neighborX, neighborY}
-			
+
 			neighborSegments, hasNeighbor := cellSegments[neighborPos]
 			if !hasNeighbor {
 				continue
 			}
-			
+
 			pairKey := fmt.Sprintf("%d,%d->%d,%d", currentX, currentY, neighborX, neighborY)
 			reversePairKey := fmt.Sprintf("%d,%d->%d,%d", neighborX, neighborY, currentX, currentY)
-			
+
 			if processedPairs[pairKey] || processedPairs[reversePairKey] {
 				continue
 			}
 			processedPairs[pairKey] = true
-			
 
 			for _, currentSegmentID := range currentSegments {
 				if adjacency[currentSegmentID] == nil {
 					adjacency[currentSegmentID] = make([]int64, 0, 8) // Pre-allocate for typical connectivity
 				}
-				
+
 				adjacency[currentSegmentID] = append(adjacency[currentSegmentID], neighborSegments...)
 			}
-			
+
 			for _, neighborSegmentID := range neighborSegments {
 				if adjacency[neighborSegmentID] == nil {
 					adjacency[neighborSegmentID] = make([]int64, 0, 8)
 				}
-				
+
 				adjacency[neighborSegmentID] = append(adjacency[neighborSegmentID], currentSegments...)
 			}
 		}
 	}
-	
+
 	return adjacency
 }

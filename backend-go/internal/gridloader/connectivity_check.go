@@ -11,7 +11,6 @@ import (
 func (gl *GridLoader) validateAndRepairConnectivity(grid *domainmodels.Grid) error {
 	fmt.Printf("Validating and repairing network connectivity...\n")
 
-	
 	components := gl.findConnectedComponents(grid)
 
 	if len(components) <= 1 {
@@ -23,7 +22,6 @@ func (gl *GridLoader) validateAndRepairConnectivity(grid *domainmodels.Grid) err
 
 	connectionsAdded := gl.connectDisconnectedComponents(grid, components)
 
-	
 	componentsAfterRepair := gl.findConnectedComponents(grid)
 
 	if len(componentsAfterRepair) > 1 {
@@ -36,7 +34,7 @@ func (gl *GridLoader) validateAndRepairConnectivity(grid *domainmodels.Grid) err
 }
 
 func (gl *GridLoader) findConnectedComponents(grid *domainmodels.Grid) [][]int64 {
-	
+
 	var endpointIndex utils.EndpointIndex
 	if gl.endpointIndex != nil {
 		endpointIndex = gl.endpointIndex
@@ -46,7 +44,7 @@ func (gl *GridLoader) findConnectedComponents(grid *domainmodels.Grid) [][]int64
 
 	adjacency := make(map[int64][]int64)
 	allSegments := make(map[int64]bool)
-	processedSegments := make(map[int64]bool) 
+	processedSegments := make(map[int64]bool)
 
 	for _, cell := range grid.Cells {
 		for _, cellRoad := range cell.RoadSegments {
@@ -260,10 +258,9 @@ func (gl *GridLoader) validateConnectedAccessibility(grid *domainmodels.Grid) er
 
 func (gl *GridLoader) generateConnectivityReport(grid *domainmodels.Grid) *ConnectivityReport {
 	startTime := time.Now()
-	
-	
+
 	components := gl.findConnectedComponents(grid)
-	
+
 	analysisTime := time.Since(startTime)
 
 	report := &ConnectivityReport{
@@ -278,7 +275,6 @@ func (gl *GridLoader) generateConnectivityReport(grid *domainmodels.Grid) *Conne
 		report.ComponentSizes[i] = len(component)
 	}
 
-	
 	for _, cell := range grid.Cells {
 		switch cell.CellType {
 		case domainmodels.CellTypeRefuel:
@@ -292,7 +288,6 @@ func (gl *GridLoader) generateConnectivityReport(grid *domainmodels.Grid) *Conne
 		}
 	}
 
-	
 	if report.TotalSegments > 0 {
 		totalConnections := 0
 		if grid.RoadGraph != nil {
@@ -300,8 +295,8 @@ func (gl *GridLoader) generateConnectivityReport(grid *domainmodels.Grid) *Conne
 				totalConnections += len(connections)
 			}
 		}
-		
-		report.NetworkDensity = float64(totalConnections) / float64(report.TotalSegments*2) 
+
+		report.NetworkDensity = float64(totalConnections) / float64(report.TotalSegments*2)
 		report.AverageConnectivity = float64(totalConnections) / float64(report.TotalSegments)
 	}
 
@@ -317,5 +312,5 @@ type ConnectivityReport struct {
 	AccessibleDepots       int     `json:"accessible_depots"`
 	NetworkDensity         float64 `json:"network_density"`
 	AverageConnectivity    float64 `json:"average_connectivity"`
-	AnalysisTimeMs float64`json:"analysis_time_ms"`
+	AnalysisTimeMs         float64 `json:"analysis_time_ms"`
 }

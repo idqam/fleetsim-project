@@ -98,7 +98,7 @@ func (ei EndpointIndex) PrintIndexStats() {
 	maxSegmentsAtPoint := 0
 	intersectionCount := 0
 	deadEndCount := 0
-	
+
 	for _, segments := range ei {
 		totalSegmentEndpoints += len(segments)
 		if len(segments) > maxSegmentsAtPoint {
@@ -111,14 +111,14 @@ func (ei EndpointIndex) PrintIndexStats() {
 			deadEndCount++
 		}
 	}
-	
+
 	fmt.Printf("Endpoint Index Statistics:\n")
 	fmt.Printf("  • Total indexed points: %d\n", totalPoints)
 	fmt.Printf("  • Total segment endpoints: %d\n", totalSegmentEndpoints)
 	fmt.Printf("  • Max segments at one point: %d\n", maxSegmentsAtPoint)
 	fmt.Printf("  • Major intersections (3+ segments): %d\n", intersectionCount)
 	fmt.Printf("  • Dead ends (1 segment): %d\n", deadEndCount)
-	
+
 	if totalPoints > 0 {
 		avgSegmentsPerPoint := float64(totalSegmentEndpoints) / float64(totalPoints)
 		fmt.Printf("  • Average segments per point: %.1f\n", avgSegmentsPerPoint)
@@ -127,67 +127,61 @@ func (ei EndpointIndex) PrintIndexStats() {
 
 func (ei EndpointIndex) ValidateEndpointIndex(grid *domainmodels.Grid) []string {
 	var issues []string
-	
-	
+
 	segmentsSeen := make(map[int64]bool)
 	for _, segments := range ei {
 		for _, segmentID := range segments {
 			segmentsSeen[segmentID] = true
 		}
 	}
-	
-	
+
 	actualSegments := make(map[int64]bool)
 	for _, cell := range grid.Cells {
 		for _, cellRoad := range cell.RoadSegments {
 			actualSegments[cellRoad.RoadSegment.ID] = true
 		}
 	}
-	
-	
+
 	for segmentID := range actualSegments {
 		if !segmentsSeen[segmentID] {
 			issues = append(issues, fmt.Sprintf("Segment %d not found in endpoint index", segmentID))
 		}
 	}
-	
-	
+
 	for segmentID := range segmentsSeen {
 		if !actualSegments[segmentID] {
 			issues = append(issues, fmt.Sprintf("Segment %d in endpoint index but not in grid", segmentID))
 		}
 	}
-	
+
 	return issues
 }
 func FindConnectedSegmentsFast(target domainmodels.RoadSegment, endpointIndex EndpointIndex) []int64 {
-	connectionSet := make(map[int64]bool) 
-	
+	connectionSet := make(map[int64]bool)
+
 	startPoint := [2]int64{target.StartX, target.StartY}
 	if segmentsAtStart, exists := endpointIndex[startPoint]; exists {
 		for _, segmentID := range segmentsAtStart {
-			if segmentID != target.ID { 
+			if segmentID != target.ID {
 				connectionSet[segmentID] = true
 			}
 		}
 	}
-	
-	
+
 	endPoint := [2]int64{target.EndX, target.EndY}
 	if segmentsAtEnd, exists := endpointIndex[endPoint]; exists {
 		for _, segmentID := range segmentsAtEnd {
-			if segmentID != target.ID { 
+			if segmentID != target.ID {
 				connectionSet[segmentID] = true
 			}
 		}
 	}
-	
-	
+
 	connections := make([]int64, 0, len(connectionSet))
 	for segmentID := range connectionSet {
 		connections = append(connections, segmentID)
 	}
-	
+
 	return connections
 }
 
@@ -198,55 +192,51 @@ func (ei EndpointIndex) GetEndpointCount(x, y int64) int {
 
 func (ei EndpointIndex) GetIntersectionPoints() [][2]int64 {
 	var intersections [][2]int64
-	
+
 	for point, segments := range ei {
-		if len(segments) >= 3 { 
+		if len(segments) >= 3 {
 			intersections = append(intersections, point)
 		}
 	}
-	
+
 	return intersections
 }
 
 func (ei EndpointIndex) GetDeadEnds() [][2]int64 {
 	var deadEnds [][2]int64
-	
+
 	for point, segments := range ei {
 		if len(segments) == 1 {
 			deadEnds = append(deadEnds, point)
 		}
 	}
-	
+
 	return deadEnds
 }
+
 type EndpointIndex map[[2]int64][]int64
 
 func BuildEndpointIndex(grid *domainmodels.Grid) EndpointIndex {
 	index := make(EndpointIndex)
-	
-	
+
 	processedSegments := make(map[int64]bool)
-	
+
 	for _, cell := range grid.Cells {
 		for _, cellRoad := range cell.RoadSegments {
 			segment := cellRoad.RoadSegment
-			
-			
+
 			if processedSegments[segment.ID] {
 				continue
 			}
 			processedSegments[segment.ID] = true
-			
-			
+
 			startPoint := [2]int64{segment.StartX, segment.StartY}
 			index[startPoint] = append(index[startPoint], segment.ID)
-			
-			
+
 			endPoint := [2]int64{segment.EndX, segment.EndY}
 			index[endPoint] = append(index[endPoint], segment.ID)
 		}
 	}
-	
+
 	return index
 }
-

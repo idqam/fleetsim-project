@@ -24,10 +24,10 @@ type Vehicle struct {
 	Profile VehicleProfile          `json:"profile"`
 	Status  constants.VehicleStatus `json:"status"`
 
-	SpawnRequestID *string    `json:"spawn_request_id,omitempty"`
+	SpawnRequestID *string `json:"spawn_request_id,omitempty"`
 	// UserSessionID  *string    `json:"user_session_id,omitempty"`
-	CustomName     *string    `json:"custom_name,omitempty"`
-	SpawnedAt      *time.Time `json:"spawned_at,omitempty"`
+	CustomName *string    `json:"custom_name,omitempty"`
+	SpawnedAt  *time.Time `json:"spawned_at,omitempty"`
 
 	CurrentCell     *Cell        `json:"current_cell,omitempty"`
 	CurrentRoad     *RoadSegment `json:"current_road,omitempty"`
@@ -58,51 +58,51 @@ type UserSpawnIntent struct {
 }
 
 func (v *Vehicle) TankLiters() float64 {
-    return v.Profile.TankLiters
+	return v.Profile.TankLiters
 }
 
 func (v *Vehicle) MaxSpeedKPH() int {
-    return v.Profile.MaxSpeedKPH
+	return v.Profile.MaxSpeedKPH
 }
 
 func (v *Vehicle) VehicleType() constants.VehicleType {
-    return v.Profile.VehicleType
+	return v.Profile.VehicleType
 }
 
 func (v *Vehicle) ConsumptionL100KM() float64 {
-    return v.Profile.ConsumptionL100KM
+	return v.Profile.ConsumptionL100KM
 }
 
 func (v *Vehicle) GetFuelRange() float64 {
-    if v.Profile.TankLiters == 0 {
-        return 0
-    }
-    return (v.Profile.TankLiters / v.Profile.ConsumptionL100KM) * 100
+	if v.Profile.TankLiters == 0 {
+		return 0
+	}
+	return (v.Profile.TankLiters / v.Profile.ConsumptionL100KM) * 100
 }
 
 func (v *Vehicle) GetFuelPercentage() float64 {
-    if v.Profile.TankLiters == 0 {
-        return 0
-    }
-    return v.FuelLevel / v.Profile.TankLiters
+	if v.Profile.TankLiters == 0 {
+		return 0
+	}
+	return v.FuelLevel / v.Profile.TankLiters
 }
 
 func (v *Vehicle) IsLowFuel() bool {
-    return v.GetFuelPercentage() < 0.25
+	return v.GetFuelPercentage() < 0.25
 }
 
 func (v *Vehicle) CanUseSegment(segment *RoadSegment) bool {
-    if segment.SpeedLimit == nil {
-        return true
-    }
-    return v.Profile.MaxSpeedKPH >= int(*segment.SpeedLimit)
+	if segment.SpeedLimit == nil {
+		return true
+	}
+	return v.Profile.MaxSpeedKPH >= int(*segment.SpeedLimit)
 }
 
 func (v *Vehicle) EstimatedTravelTime(distanceKM float64) time.Duration {
-    speedKPH := float64(v.Profile.MaxSpeedKPH) * v.SpeedMultiplier
-    if speedKPH <= 0 {
-        return 0
-    }
-    hours := distanceKM / speedKPH
-    return time.Duration(hours * float64(time.Hour))
+	speedKPH := float64(v.Profile.MaxSpeedKPH) * v.SpeedMultiplier
+	if speedKPH <= 0 {
+		return 0
+	}
+	hours := distanceKM / speedKPH
+	return time.Duration(hours * float64(time.Hour))
 }

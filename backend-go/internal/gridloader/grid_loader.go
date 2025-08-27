@@ -25,7 +25,7 @@ type GridLoader struct {
 
 	SegmentIDCounter  int64
 	GenerationStatsSu *GenerationStats
-	endpointIndex utils.EndpointIndex
+	endpointIndex     utils.EndpointIndex
 }
 
 type GenerationStats struct {
@@ -246,7 +246,6 @@ func (gl *GridLoader) validateRoadConnectivity(grid *domainmodels.Grid) error {
 			}
 			processedSegments[segment.ID] = true
 
-			
 			connections := utils.FindConnectedSegmentsFast(segment, endpointIndex)
 			adjacency[segment.ID] = connections
 		}
@@ -256,7 +255,6 @@ func (gl *GridLoader) validateRoadConnectivity(grid *domainmodels.Grid) error {
 		return nil
 	}
 
-	
 	visited := make(map[int64]bool)
 	componentCount := 0
 
@@ -330,12 +328,11 @@ func (gl *GridLoader) logGenerationStats() {
 	fmt.Printf("=====================================\n\n")
 }
 
-
 func (gl *GridLoader) useRealisticRoadConnections(grid *domainmodels.Grid) {
 	fmt.Println("Switching to realistic geometric road connections...")
 	geometricAdjacency := gl.buildGeometricAdjacency(grid)
 	grid.RoadGraph = &domainmodels.RoadGraph{Adjacency: geometricAdjacency}
-	fmt.Printf("Updated to geometric adjacency: %d connections\n", 
+	fmt.Printf("Updated to geometric adjacency: %d connections\n",
 		countTotalConnections(geometricAdjacency))
 }
 func countTotalConnections(adjacency map[int64][]int64) int {

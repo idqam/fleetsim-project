@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strconv"
 
 	"owenvi.com/fleetsim/internal/config"
 	"owenvi.com/fleetsim/internal/domainmodels"
@@ -15,13 +17,29 @@ func main() {
 	config := config.Config()
 
 	gridLoader := gridloader.NewGridLoader()
-	gridLoader.ConfigureForTesting(20, 20, 42, 0, 0.02, 0, 0.6, 0.3, 0.1)
+	args := os.Args[1:]
+	
+	dimX := args[0]
+	dimY := args[1]
+	
+	width, e1 :=strconv.Atoi(dimX)
+	height, e2 :=strconv.Atoi(dimY)
+	if e1!= nil{
+		panic("width must be numeric")
+	}
+	if e2 != nil {
+		panic("height must be numeric")
+	}
+	
+	
+	 
+	gridLoader.ConfigureForTesting(int64(width), int64(height), 42, 0, 0.02, 0, 0.6, 0.3, 0.1)
 
 	vehicleSpawner := gridloader.NewVehicleSpawner(config, 42)
 
 	fmt.Println("Generating 20x20 grid with roads and special locations...")
 
-	demoWorld, err := gridLoader.CreateDemoGrid(10, vehicleSpawner)
+	demoWorld, err := gridLoader.CreateDemoGrid(20, vehicleSpawner)
 	if err != nil {
 		fmt.Printf("Grid generation failed: %v\n", err)
 		return
@@ -74,7 +92,7 @@ func main() {
 	totalChecks := 0
 
 	for _, vehicle := range demoWorld.Vehicles {
-		
+
 		adjacentPositions := [][2]int64{
 			{vehicle.CurrentCell.Xpos + 1, vehicle.CurrentCell.Ypos},
 			{vehicle.CurrentCell.Xpos - 1, vehicle.CurrentCell.Ypos},
@@ -107,8 +125,6 @@ func main() {
 
 	demoWorld.PrintASCIIVisualization()
 
-	
-	
 	fmt.Println("WEEK 1 MILESTONE COMPLETED")
 
 	fmt.Println("✅ Go project structure with domain models")
