@@ -66,6 +66,7 @@ func (gl *GridLoader) findEligibleCells(grid *domainmodels.Grid) []*domainmodels
 	return eligible
 }
 
+
 func (gl *GridLoader) isCellStrategicallyEligible(grid *domainmodels.Grid, cell *domainmodels.Cell) bool {
 
 	margin := int64(1)

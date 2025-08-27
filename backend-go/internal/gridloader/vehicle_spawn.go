@@ -134,7 +134,7 @@ func (vs *VehicleSpawner) findValidSpawnLocations(grid *domainmodels.Grid) []*do
 			continue
 		}
 
-		if vs.isSuitableSpawnLocation(grid, cell) {
+		if utils.IsSuitableSpawnLocation(grid, cell) {
 			validLocations = append(validLocations, cell)
 		}
 	}
@@ -142,24 +142,7 @@ func (vs *VehicleSpawner) findValidSpawnLocations(grid *domainmodels.Grid) []*do
 	return validLocations
 }
 
-func (vs *VehicleSpawner) isSuitableSpawnLocation(grid *domainmodels.Grid, cell *domainmodels.Cell) bool {
 
-	if cell.CellType == domainmodels.CellTypeDepot {
-		return true
-	}
-
-	if cell.CellType == domainmodels.CellTypeNormal {
-
-		connectionCount := utils.CountCellConnections(grid, cell)
-		return connectionCount >= 1
-	}
-
-	if cell.CellType == domainmodels.CellTypeRefuel {
-		return true
-	}
-
-	return false
-}
 
 func (vs *VehicleSpawner) getConnectionDirection(dx, dy int64) string {
 	if dx > 0 {

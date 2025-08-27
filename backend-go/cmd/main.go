@@ -37,7 +37,7 @@ func main() {
 
 	vehicleSpawner := gridloader.NewVehicleSpawner(config, 42)
 
-	fmt.Println("Generating 20x20 grid with roads and special locations...")
+	fmt.Printf("Generating %s x %s grid with roads and special locations...", dimX, dimY)
 
 	demoWorld, err := gridLoader.CreateDemoGrid(20, vehicleSpawner)
 	if err != nil {
@@ -45,7 +45,7 @@ func main() {
 		return
 	}
 
-	fmt.Printf("✅ Generated 20x20 grid successfully\n")
+	fmt.Printf("✅ Generated %s by %s grid successfully\n", dimX, dimY)
 	fmt.Printf("   • Grid dimensions: %dx%d\n", demoWorld.Grid.DimX, demoWorld.Grid.DimY)
 	fmt.Printf("   • Total cells: %d\n", len(demoWorld.Grid.Cells))
 	fmt.Printf("   • Road segments: %d\n", demoWorld.Stats.TotalSegments)
@@ -121,16 +121,16 @@ func main() {
 
 	fmt.Printf("   • Movement validation: %d/%d adjacent cells have road access\n", validMoves, totalChecks)
 
-	fmt.Println("20x20 GRID VISUALIZATION")
+	fmt.Printf("%s x %s GRID VISUALIZATION", dimX, dimY)
 
 	demoWorld.PrintASCIIVisualization()
 
 	fmt.Println("WEEK 1 MILESTONE COMPLETED")
 
 	fmt.Println("✅ Go project structure with domain models")
-	fmt.Println("✅ Grid Loader (JSON import + procedural generation)")
+	fmt.Println("✅ Grid Loader  procedural generation")
 	fmt.Println("✅ Basic Vehicle and Cell structs")
-	fmt.Println("✅ 20x20 demo grid with roads, fuel stations, depots")
+	fmt.Printf("✅ %s x %s demo grid with roads, fuel stations, depots\n", dimX, dimY)
 	fmt.Println("✅ Simple vehicle spawning at random locations")
 	fmt.Println("✅ Generated grid with roads and special locations displayed")
 	fmt.Println("✅ 10 vehicles spawned at different positions shown")

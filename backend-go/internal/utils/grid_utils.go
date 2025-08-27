@@ -58,3 +58,22 @@ func  GetCellAtGrid(grid *domainmodels.Grid, x, y int64) *domainmodels.Cell {
 	}
 	return nil
 }
+
+func IsSuitableSpawnLocation(grid *domainmodels.Grid, cell *domainmodels.Cell) bool {
+
+	if cell.CellType == domainmodels.CellTypeDepot {
+		return true
+	}
+
+	if cell.CellType == domainmodels.CellTypeNormal {
+
+		connectionCount := CountCellConnections(grid, cell)
+		return connectionCount >= 1
+	}
+
+	if cell.CellType == domainmodels.CellTypeRefuel {
+		return true
+	}
+
+	return false
+}
