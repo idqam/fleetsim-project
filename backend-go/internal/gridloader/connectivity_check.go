@@ -189,8 +189,8 @@ func (gl *GridLoader) getSegmentCells(grid *domainmodels.Grid, segmentIDs []int6
 }
 
 func (gl *GridLoader) isValidBridgeConnection(grid *domainmodels.Grid, connection *BridgeConnection) bool {
-	fromCell := gl.getCellAtGrid(grid, connection.FromX, connection.FromY)
-	toCell := gl.getCellAtGrid(grid, connection.ToX, connection.ToY)
+	fromCell := utils.GetCellAtGrid(grid, connection.FromX, connection.FromY)
+	toCell := utils.GetCellAtGrid(grid, connection.ToX, connection.ToY)
 
 	if fromCell == nil || toCell == nil {
 		return false

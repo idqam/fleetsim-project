@@ -47,3 +47,14 @@ func CountCellConnections(grid *domainmodels.Grid, cell *domainmodels.Cell) int 
 
 	return len(connections)
 }
+
+
+func  GetCellAtGrid(grid *domainmodels.Grid, x, y int64) *domainmodels.Cell {
+	for i := range grid.Cells {
+		cell := &grid.Cells[i]
+		if cell.Xpos == x && cell.Ypos == y {
+			return cell
+		}
+	}
+	return nil
+}

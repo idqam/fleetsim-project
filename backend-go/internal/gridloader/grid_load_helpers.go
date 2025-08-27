@@ -746,7 +746,7 @@ func (gl *GridLoader) calculateNearbyRoadInfluence(grid *domainmodels.Grid, x, y
 			adjX, adjY := x+dx, y+dy
 
 			if adjX >= 0 && adjX < gl.Width && adjY >= 0 && adjY < gl.Height {
-				adjCell := gl.getCellAtGrid(grid, adjX, adjY)
+				adjCell := utils.GetCellAtGrid(grid, adjX, adjY)
 				if adjCell != nil && len(adjCell.RoadSegments) > 0 {
 					roadsNearby++
 				}
@@ -886,18 +886,10 @@ func (gl *GridLoader) addRandomConnection(grid *domainmodels.Grid, cell *domainm
 	return false
 }
 
-func (gl *GridLoader) getCellAtGrid(grid *domainmodels.Grid, x, y int64) *domainmodels.Cell {
-	for i := range grid.Cells {
-		cell := &grid.Cells[i]
-		if cell.Xpos == x && cell.Ypos == y {
-			return cell
-		}
-	}
-	return nil
-}
+
 
 func (gl *GridLoader) addSegmentToCell(grid *domainmodels.Grid, x, y int64, segment domainmodels.RoadSegment) {
-	cell := gl.getCellAtGrid(grid, x, y)
+	cell := utils.GetCellAtGrid(grid, x, y)
 	if cell != nil {
 		cellRoad := domainmodels.CellRoad{
 			RoadSegmentID: segment.ID,
@@ -908,7 +900,7 @@ func (gl *GridLoader) addSegmentToCell(grid *domainmodels.Grid, x, y int64, segm
 }
 
 func (gl *GridLoader) connectionExists(grid *domainmodels.Grid, fromX, fromY, toX, toY int64) bool {
-	fromCell := gl.getCellAtGrid(grid, fromX, fromY)
+	fromCell := utils.GetCellAtGrid(grid, fromX, fromY)
 	if fromCell == nil {
 		return false
 	}
