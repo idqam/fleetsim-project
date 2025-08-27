@@ -73,11 +73,8 @@ func main() {
 	validMoves := 0
 	totalChecks := 0
 
-	for i, vehicle := range demoWorld.Vehicles {
-		if i >= 3 {
-			break
-		}
-
+	for _, vehicle := range demoWorld.Vehicles {
+		
 		adjacentPositions := [][2]int64{
 			{vehicle.CurrentCell.Xpos + 1, vehicle.CurrentCell.Ypos},
 			{vehicle.CurrentCell.Xpos - 1, vehicle.CurrentCell.Ypos},
@@ -109,11 +106,9 @@ func main() {
 	fmt.Println("20x20 GRID VISUALIZATION")
 
 	demoWorld.PrintASCIIVisualization()
-	fmt.Println("DEMOWORLD")
-	fmt.Println(demoWorld.Grid.RoadGraph.Adjacency[1])
-	fmt.Println("GRIDLOADER")
-	fmt.Println(gridLoader.GenerationStatsSu.RoadGraphs.Adjacency[1])
 
+	
+	
 	fmt.Println("WEEK 1 MILESTONE COMPLETED")
 
 	fmt.Println("✅ Go project structure with domain models")
