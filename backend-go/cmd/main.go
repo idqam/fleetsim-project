@@ -33,9 +33,13 @@ func main() {
 	
 	
 	 
-	gridLoader.ConfigureForTesting(int64(width), int64(height), 42, 0, 0.02, 0, 0.6, 0.3, 0.1)
-
-	vehicleSpawner := gridloader.NewVehicleSpawner(config, 42)
+	//gridLoader.ConfigureForTesting(int64(width), int64(height), 42, 0, 0.02, 0, 0.2, 0.3, 0.1)
+//gridLoader.ConfigureForTesting(int64(width), int64(height), 42, 0.03, 0.01, 0.02, 0.6, 0.2, 0.1)
+gridLoader.ConfigureForTesting(int64(width), int64(height), 99, 0.05, 0.02, 0.05, 0.7, 0.3, 0.1)	
+//gridloader.ConfigureForTesting(int64(width), int64(height),, 1337, 0.08, 0.03, 0.02, 0.85, 0.5, 0.05)
+//gridloader.ConfigureForTesting(int64(width), int64(height), 7, 0.02, 0.01, 0.08, 0.4, 0.15, 0.25)
+//gridLoader.ConfigureForTesting(int64(width), int64(height), 12345, 0.05, 0.02, 0.05, 0.7, 0.35, 0.1)
+vehicleSpawner := gridloader.NewVehicleSpawner(config, 42)
 
 	fmt.Printf("Generating %s x %s grid with roads and special locations...", dimX, dimY)
 

@@ -71,6 +71,12 @@ type DemoWorld struct {
 	Stats    *GenerationStats       `json:"stats"`
 }
 
+func toRuneSlice(val string) rune {
+
+	return []rune(val)[0]
+
+}
+
 func (world *DemoWorld) PrintASCIIVisualization() {
 	grid := world.Grid
 
@@ -93,18 +99,18 @@ func (world *DemoWorld) PrintASCIIVisualization() {
 		switch cell.CellType {
 		case domainmodels.CellTypeNormal:
 			if len(cell.RoadSegments) > 0 {
-				symbol = '─'
+				symbol = '-'
 			} else {
 				symbol = '.'
 			}
 		case domainmodels.CellTypeRefuel:
-			symbol = 'F'
+			symbol = toRuneSlice("\U000026FD")
 		case domainmodels.CellTypeDepot:
-			symbol = 'D'
+			symbol = toRuneSlice("\U0001F3ED")
 		case domainmodels.CellTypeBlocked:
-			symbol = 'X'
+			symbol = toRuneSlice("\U0001F6D1")
 		default:
-			symbol = '?'
+			symbol = toRuneSlice("\U00002753")
 		}
 
 		display[y][x] = symbol
@@ -116,27 +122,28 @@ func (world *DemoWorld) PrintASCIIVisualization() {
 
 			switch vehicle.Profile.VehicleType {
 			case constants.VehicleTypeCar:
-				display[y][x] = 'c'
+				display[y][x] = []rune( "\U0001F697")[0] //C
 			case constants.VehicleTypeVan:
-				display[y][x] = 'v'
+				display[y][x] = []rune( "\U0001F69A")[0] //T
 			case constants.VehicleTypeTruck:
-				display[y][x] = 't'
+				display[y][x] = []rune("\U0001F690")[0] //V
 			}
 		}
 	}
-	fmt.Print("   ")
-	for x := int64(0); x < grid.DimX; x++ {
-		fmt.Printf("%2d", x%10)
-	}
-	fmt.Println()
+	fmt.Print("   ") 
+for x := int64(0); x < grid.DimX; x++ {
+    fmt.Printf("%2d ", x)
+}
+fmt.Println()
 
-	for y := int64(0); y < grid.DimY; y++ {
-		fmt.Printf("%2d ", y)
-		for x := int64(0); x < grid.DimX; x++ {
-			fmt.Printf(" %c", display[y][x])
-		}
-		fmt.Println()
-	}
+
+for y := int64(0); y < grid.DimY; y++ {
+    fmt.Printf("%2d ", y)
+    for x := int64(0); x < grid.DimX; x++ {
+        fmt.Printf(" %c ", display[y][x]) 
+    }
+    fmt.Println()
+}
 
 	fmt.Printf("\nLegend: . = empty, ─ = road, F = fuel, D = depot, X = blocked\n")
 	fmt.Printf("Vehicles: c = car, v = van, t = truck\n")

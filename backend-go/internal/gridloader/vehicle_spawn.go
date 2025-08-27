@@ -193,7 +193,7 @@ func (vs *VehicleSpawner) createVehicle(vehicleType string, spawnLocation *domai
 
 		CurrentCell:     spawnLocation,
 		OriginCell:      spawnLocation,
-		Progress:        0.0,
+		// Progress:        0.0,
 		CurrentSpeedKPH: 0.0,
 
 		FuelLevel:       initialFuelAmount,
@@ -201,13 +201,7 @@ func (vs *VehicleSpawner) createVehicle(vehicleType string, spawnLocation *domai
 		ProximityLOD:    false,
 
 		SpawnedAt: &[]time.Time{time.Now()}[0],
-		SpawnIntent: &domainmodels.UserSpawnIntent{
-			RequestedVehicleType:   profile.VehicleType,
-			RequestedSpawnLocation: "random",
-			RequestedDestination:   "random",
-			RequestedFuelPercent:   &initialFuelPercent,
-			UserNotes:              &[]string{"Week 1 random spawn"}[0],
-		},
+		
 	}
 
 	return vehicle
