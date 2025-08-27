@@ -19,45 +19,39 @@ func BFSMarkConnected(segmentID int64, adjacency map[int64][]int64, explored map
 	}
 }
 
-
 func FindConnectedComponents(grid *domainmodels.Grid) [][]int64 {
-	
+
 	adjacency := make(map[int64][]int64)
 	allSegments := make(map[int64]bool)
-	
-	
+
 	for _, cell := range grid.Cells {
 		for _, cellRoad := range cell.RoadSegments {
 			segment := cellRoad.RoadSegment
 			allSegments[segment.ID] = true
-			
-			
+
 			connections := FindConnectedSegments(segment, grid)
 			adjacency[segment.ID] = connections
 		}
 	}
-	
-	
+
 	if len(allSegments) == 0 {
 		return [][]int64{}
 	}
-	
-	
+
 	visited := make(map[int64]bool)
 	var components [][]int64
-	
+
 	for segmentID := range allSegments {
 		if !visited[segmentID] {
-			
+
 			component := []int64{}
 			DfsCollectComponent(segmentID, adjacency, visited, &component)
 			components = append(components, component)
 		}
 	}
-	
+
 	return components
 }
-
 
 func FindConnectedSegments(target domainmodels.RoadSegment, grid *domainmodels.Grid) []int64 {
 	var connections []int64
@@ -84,12 +78,10 @@ func FindConnectedSegments(target domainmodels.RoadSegment, grid *domainmodels.G
 	return connections
 }
 
-
 func DfsCollectComponent(segmentID int64, adjacency map[int64][]int64, visited map[int64]bool, component *[]int64) {
 	visited[segmentID] = true
 	*component = append(*component, segmentID)
-	
-	
+
 	for _, connectedID := range adjacency[segmentID] {
 		if !visited[connectedID] {
 			DfsCollectComponent(connectedID, adjacency, visited, component)

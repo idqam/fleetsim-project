@@ -7,25 +7,24 @@ import (
 	"owenvi.com/fleetsim/internal/reqpays"
 )
 
-
 type WebSocketMessage struct {
 	Type      constants.WSMessageType `json:"type"`
-	Timestamp time.Time     `json:"timestamp"`
-	Data      any   `json:"data"`
+	Timestamp time.Time               `json:"timestamp"`
+	Data      any                     `json:"data"`
 
 	UserSessionID *string `json:"user_session_id,omitempty"`
 	RequestID     *string `json:"request_id,omitempty"`
 }
 
 type VehiclePositionUpdate struct {
-	VehicleID     string        `json:"vehicle_id"`
-	Xpos          int64         `json:"xpos"`
-	Ypos          int64         `json:"ypos"`
-	SpeedKPH      float64       `json:"speed_kph"`
+	VehicleID     string                  `json:"vehicle_id"`
+	Xpos          int64                   `json:"xpos"`
+	Ypos          int64                   `json:"ypos"`
+	SpeedKPH      float64                 `json:"speed_kph"`
 	Status        constants.VehicleStatus `json:"status"`
-	RoadSegmentID *int64        `json:"road_segment_id,omitempty"`
-	EdgeProgress  float64       `json:"edge_progress"`
-	FuelLevel     float64       `json:"fuel_level"`
+	RoadSegmentID *int64                  `json:"road_segment_id,omitempty"`
+	EdgeProgress  float64                 `json:"edge_progress"`
+	FuelLevel     float64                 `json:"fuel_level"`
 
 	UserSessionID  *string `json:"user_session_id,omitempty"`
 	CustomName     *string `json:"custom_name,omitempty"`
@@ -33,8 +32,8 @@ type VehiclePositionUpdate struct {
 }
 
 type SpawnRequestMessage struct {
-	RequestID     string              `json:"request_id"`
-	UserSessionID string              `json:"user_session_id"`
+	RequestID     string                      `json:"request_id"`
+	UserSessionID string                      `json:"user_session_id"`
 	SpawnRequest  reqpays.VehicleSpawnRequest `json:"spawn_request"`
 }
 

@@ -7,24 +7,22 @@ import (
 	"owenvi.com/fleetsim/internal/constants"
 )
 
-
-
 type VehicleProfile struct {
-	ID                int64       `json:"id"`
-	Name              string      `json:"name"`
+	ID                int64                 `json:"id"`
+	Name              string                `json:"name"`
 	VehicleType       constants.VehicleType `json:"vehicle_type"`
-	TankLiters        float64     `json:"tank_liters"`
-	ConsumptionL100KM float64     `json:"consumption_l_per_100km"`
-	MaxSpeedKPH       int         `json:"max_speed_kph"`
-	CargoCapacityKG   float64     `json:"cargo_capacity_kg"`
+	TankLiters        float64               `json:"tank_liters"`
+	ConsumptionL100KM float64               `json:"consumption_l_per_100km"`
+	MaxSpeedKPH       int                   `json:"max_speed_kph"`
+	CargoCapacityKG   float64               `json:"cargo_capacity_kg"`
 }
 
 type Vehicle struct {
-	ID      string         `json:"id"`
-	Class   constants.VehicleClass   `json:"class"`
-	FleetID *uuid.UUID     `json:"fleet_id,omitempty"`
-	Profile VehicleProfile `json:"profile"`
-	Status  constants.VehicleStatus  `json:"status"`
+	ID      string                  `json:"id"`
+	Class   constants.VehicleClass  `json:"class"`
+	FleetID *uuid.UUID              `json:"fleet_id,omitempty"`
+	Profile VehicleProfile          `json:"profile"`
+	Status  constants.VehicleStatus `json:"status"`
 
 	SpawnRequestID *string    `json:"spawn_request_id,omitempty"`
 	UserSessionID  *string    `json:"user_session_id,omitempty"`
@@ -53,8 +51,8 @@ type Vehicle struct {
 
 type UserSpawnIntent struct {
 	RequestedVehicleType   constants.VehicleType `json:"requested_vehicle_type"`
-	RequestedSpawnLocation string      `json:"requested_spawn_location"`
-	RequestedDestination   string      `json:"requested_destination"`
-	RequestedFuelPercent   *float64    `json:"requested_fuel_percent,omitempty"`
-	UserNotes              *string     `json:"user_notes,omitempty"`
+	RequestedSpawnLocation string                `json:"requested_spawn_location"`
+	RequestedDestination   string                `json:"requested_destination"`
+	RequestedFuelPercent   *float64              `json:"requested_fuel_percent,omitempty"`
+	UserNotes              *string               `json:"user_notes,omitempty"`
 }

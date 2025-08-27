@@ -31,10 +31,10 @@ func GetDirectionString(dx, dy int64) string {
 
 func CountCellConnections(grid *domainmodels.Grid, cell *domainmodels.Cell) int {
 	connections := make(map[string]bool)
-	
+
 	for _, cellRoad := range cell.RoadSegments {
 		segment := cellRoad.RoadSegment
-		
+
 		if segment.StartX == cell.Xpos && segment.StartY == cell.Ypos {
 
 			direction := GetDirectionString(segment.EndX-segment.StartX, segment.EndY-segment.StartY)
@@ -44,9 +44,6 @@ func CountCellConnections(grid *domainmodels.Grid, cell *domainmodels.Cell) int 
 			connections[direction] = true
 		}
 	}
-	
+
 	return len(connections)
 }
-
-
-

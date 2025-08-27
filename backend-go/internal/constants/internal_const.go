@@ -12,7 +12,6 @@ const (
 	SpawnRequestStatusCancelled  SpawnRequestStatus = "cancelled"
 )
 
-
 type VehicleClass string
 
 const (
@@ -44,7 +43,6 @@ const (
 	VehicleTypeVan   VehicleType = "van"
 	VehicleTypeCar   VehicleType = "car"
 )
-
 
 type WSMessageType string
 

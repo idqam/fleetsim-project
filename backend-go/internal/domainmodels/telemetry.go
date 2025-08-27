@@ -13,13 +13,13 @@ type TelemetryEvent struct {
 	Timestamp       time.Time `json:"timestamp"`
 	EventType       string    `json:"event_type"`
 
-	VehicleID    *string        `json:"vehicle_id,omitempty"`
-	CellX        *int64         `json:"cell_x,omitempty"`
-	CellY        *int64         `json:"cell_y,omitempty"`
-	SpeedKPH     *float64       `json:"speed_kph,omitempty"`
-	FuelLevel    *float64       `json:"fuel_level,omitempty"`
-	CurrentSegID *int64         `json:"current_segment_id,omitempty"`
-	EdgeProgress *float64       `json:"edge_progress,omitempty"`
+	VehicleID    *string                  `json:"vehicle_id,omitempty"`
+	CellX        *int64                   `json:"cell_x,omitempty"`
+	CellY        *int64                   `json:"cell_y,omitempty"`
+	SpeedKPH     *float64                 `json:"speed_kph,omitempty"`
+	FuelLevel    *float64                 `json:"fuel_level,omitempty"`
+	CurrentSegID *int64                   `json:"current_segment_id,omitempty"`
+	EdgeProgress *float64                 `json:"edge_progress,omitempty"`
 	Status       *constants.VehicleStatus `json:"status,omitempty"`
 
 	SegmentID       *int64 `json:"segment_id,omitempty"`
@@ -37,16 +37,16 @@ type TelemetryEvent struct {
 	SpeedMultiplier *float64 `json:"speed_multiplier,omitempty"`
 }
 type VehicleState struct {
-	VehicleID     string        `json:"vehicle_id"`
-	Timestamp     time.Time     `json:"timestamp"`
-	CellX         int64         `json:"cell_x"`
-	CellY         int64         `json:"cell_y"`
-	SpeedKPH      float64       `json:"speed_kph"`
-	FuelLevel     float64       `json:"fuel_level"`
-	CurrentSegID  *int64        `json:"current_segment_id"`
-	EdgeProgress  float64       `json:"edge_progress"`
+	VehicleID     string                  `json:"vehicle_id"`
+	Timestamp     time.Time               `json:"timestamp"`
+	CellX         int64                   `json:"cell_x"`
+	CellY         int64                   `json:"cell_y"`
+	SpeedKPH      float64                 `json:"speed_kph"`
+	FuelLevel     float64                 `json:"fuel_level"`
+	CurrentSegID  *int64                  `json:"current_segment_id"`
+	EdgeProgress  float64                 `json:"edge_progress"`
 	Status        constants.VehicleStatus `json:"status"`
-	SimulatedTime int64         `json:"simulated_time_ms"`
+	SimulatedTime int64                   `json:"simulated_time_ms"`
 }
 
 type RoadLoadEvent struct {

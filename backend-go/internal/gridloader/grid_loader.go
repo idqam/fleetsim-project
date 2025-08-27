@@ -21,6 +21,7 @@ type GridLoader struct {
 	RoadDensity  float64
 	MainRoadBias float64
 	DeadEndBias  float64
+	currentGrid  *domainmodels.Grid
 
 	SegmentIDCounter  int64
 	GenerationStatsSu *GenerationStats
@@ -36,6 +37,7 @@ type GenerationStats struct {
 	DeadEnds            int
 	ConnectedComponents int
 	GenerationTimeMs    int64
+	RoadGraphs          domainmodels.RoadGraph
 }
 
 var GridLoaderDemo = GridLoader{
@@ -257,7 +259,6 @@ func (gl *GridLoader) validateRoadConnectivity(grid *domainmodels.Grid) error {
 	return nil
 }
 
-
 func (gl *GridLoader) countRoadSegments(grid *domainmodels.Grid) int {
 	segmentsSeen := make(map[int64]bool)
 
@@ -282,6 +283,10 @@ func (gl *GridLoader) analyzeGenerationResults(grid *domainmodels.Grid) {
 		if cell.CellType != domainmodels.CellTypeNormal {
 			specialCells++
 		}
+	}
+
+	if grid.RoadGraph != nil {
+		gl.GenerationStatsSu.RoadGraphs = *grid.RoadGraph
 	}
 
 	gl.GenerationStatsSu.RoadCells = roadCells

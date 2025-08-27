@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"owenvi.com/fleetsim/internal/domainmodels"
+	"owenvi.com/fleetsim/internal/utils"
 )
 
 type MoveRequest struct {
@@ -29,30 +30,16 @@ func (mv *MovementValidator) ValidateMove(request MoveRequest) bool {
 		return false
 	}
 
-	return mv.isConnected(request.FromCell, request.ToCell)
-}
-
-func (mv *MovementValidator) isConnected(from, to *domainmodels.Cell) bool {
-	for _, cellRoad := range from.RoadSegments {
-		segment := cellRoad.RoadSegment
-		
-		if (segment.StartX == from.Xpos && segment.StartY == from.Ypos &&
-			segment.EndX == to.Xpos && segment.EndY == to.Ypos) ||
-		   (segment.StartX == to.Xpos && segment.StartY == to.Ypos &&
-			segment.EndX == from.Xpos && segment.EndY == from.Ypos) {
-			return true
-		}
-	}
-	return false
+	return utils.SegmentIsConnected(request.FromCell, request.ToCell)
 }
 
 func (mv *MovementValidator) GetConnectedCells(cell *domainmodels.Cell) []*domainmodels.Cell {
 	var connected []*domainmodels.Cell
-	
+
 	for _, cellRoad := range cell.RoadSegments {
 		segment := cellRoad.RoadSegment
 		var targetX, targetY int64
-		
+
 		if segment.StartX == cell.Xpos && segment.StartY == cell.Ypos {
 			targetX, targetY = segment.EndX, segment.EndY
 		} else if segment.EndX == cell.Xpos && segment.EndY == cell.Ypos {
@@ -60,12 +47,12 @@ func (mv *MovementValidator) GetConnectedCells(cell *domainmodels.Cell) []*domai
 		} else {
 			continue
 		}
-		
+
 		if targetCell := mv.getCellAt(targetX, targetY); targetCell != nil {
 			connected = append(connected, targetCell)
 		}
 	}
-	
+
 	return connected
 }
 
