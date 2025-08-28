@@ -34,7 +34,7 @@ func FindConnectedComponents(grid *domainmodels.Grid) [][]int64 {
 			segment := cellRoad.RoadSegment
 			allSegments[segment.ID] = true
 
-			connections := FindConnectedSegmentsFast(segment,index )
+			connections := FindConnectedSegmentsFast(segment, index)
 			adjacency[segment.ID] = connections
 		}
 	}
@@ -82,7 +82,6 @@ func FindConnectedSegments(target domainmodels.RoadSegment, grid *domainmodels.G
 
 	return connections
 }
-
 
 func DfsCollectComponent(segmentID int64, adjacency map[int64][]int64, visited map[int64]bool, component *[]int64) {
 	visited[segmentID] = true

@@ -122,28 +122,27 @@ func (world *DemoWorld) PrintASCIIVisualization() {
 
 			switch vehicle.Profile.VehicleType {
 			case constants.VehicleTypeCar:
-				display[y][x] = []rune( "\U0001F697")[0] //C
+				display[y][x] = []rune("\U0001F697")[0] //C
 			case constants.VehicleTypeVan:
-				display[y][x] = []rune( "\U0001F69A")[0] //T
+				display[y][x] = []rune("\U0001F69A")[0] //T
 			case constants.VehicleTypeTruck:
 				display[y][x] = []rune("\U0001F690")[0] //V
 			}
 		}
 	}
-	fmt.Print("   ") 
-for x := int64(0); x < grid.DimX; x++ {
-    fmt.Printf("%2d ", x)
-}
-fmt.Println()
+	fmt.Print("   ")
+	for x := int64(0); x < grid.DimX; x++ {
+		fmt.Printf("%2d ", x)
+	}
+	fmt.Println()
 
-
-for y := int64(0); y < grid.DimY; y++ {
-    fmt.Printf("%2d ", y)
-    for x := int64(0); x < grid.DimX; x++ {
-        fmt.Printf(" %c ", display[y][x]) 
-    }
-    fmt.Println()
-}
+	for y := int64(0); y < grid.DimY; y++ {
+		fmt.Printf("%2d ", y)
+		for x := int64(0); x < grid.DimX; x++ {
+			fmt.Printf(" %c ", display[y][x])
+		}
+		fmt.Println()
+	}
 
 	fmt.Printf("\nLegend: . = empty, ─ = road, F = fuel, D = depot, X = blocked\n")
 	fmt.Printf("Vehicles: c = car, v = van, t = truck\n")

@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"time"
 
 	"owenvi.com/fleetsim/internal/config"
 	"owenvi.com/fleetsim/internal/domainmodels"
 	"owenvi.com/fleetsim/internal/gridloader"
+	"owenvi.com/fleetsim/internal/movement"
 )
 
 func main() {
@@ -18,32 +20,30 @@ func main() {
 
 	gridLoader := gridloader.NewGridLoader()
 	args := os.Args[1:]
-	
+
 	dimX := args[0]
 	dimY := args[1]
-	
-	width, e1 :=strconv.Atoi(dimX)
-	height, e2 :=strconv.Atoi(dimY)
-	if e1!= nil{
+
+	width, e1 := strconv.Atoi(dimX)
+	height, e2 := strconv.Atoi(dimY)
+	if e1 != nil {
 		panic("width must be numeric")
 	}
 	if e2 != nil {
 		panic("height must be numeric")
 	}
-	
-	
-	 
+
 	//gridLoader.ConfigureForTesting(int64(width), int64(height), 42, 0, 0.02, 0, 0.2, 0.3, 0.1)
-//gridLoader.ConfigureForTesting(int64(width), int64(height), 42, 0.03, 0.01, 0.02, 0.6, 0.2, 0.1)
-gridLoader.ConfigureForTesting(int64(width), int64(height), 99, 0.05, 0.02, 0.05, 0.7, 0.3, 0.1)	
-//gridloader.ConfigureForTesting(int64(width), int64(height),, 1337, 0.08, 0.03, 0.02, 0.85, 0.5, 0.05)
-//gridloader.ConfigureForTesting(int64(width), int64(height), 7, 0.02, 0.01, 0.08, 0.4, 0.15, 0.25)
-//gridLoader.ConfigureForTesting(int64(width), int64(height), 12345, 0.05, 0.02, 0.05, 0.7, 0.35, 0.1)
-vehicleSpawner := gridloader.NewVehicleSpawner(config, 42)
+	//gridLoader.ConfigureForTesting(int64(width), int64(height), 42, 0.03, 0.01, 0.02, 0.6, 0.2, 0.1)
+	gridLoader.ConfigureForTesting(int64(width), int64(height), 99, 0.05, 0.02, 0.05, 0.7, 0.3, 0.1)
+	// gridloader.ConfigureForTesting(int64(width), int64(height),, 1337, 0.08, 0.03, 0.02, 0.85, 0.5, 0.05)
+	// gridloader.ConfigureForTesting(int64(width), int64(height), 7, 0.02, 0.01, 0.08, 0.4, 0.15, 0.25)
+	// gridLoader.ConfigureForTesting(int64(width), int64(height), 12345, 0.05, 0.02, 0.05, 0.7, 0.35, 0.1)
+	vehicleSpawner := gridloader.NewVehicleSpawner(config, 42)
 
 	fmt.Printf("Generating %s x %s grid with roads and special locations...", dimX, dimY)
 
-	demoWorld, err := gridLoader.CreateDemoGrid(20, vehicleSpawner)
+	demoWorld, err := gridLoader.CreateDemoGrid(10, vehicleSpawner)
 	if err != nil {
 		fmt.Printf("Grid generation failed: %v\n", err)
 		return
@@ -128,6 +128,44 @@ vehicleSpawner := gridloader.NewVehicleSpawner(config, 42)
 	fmt.Printf("%s x %s GRID VISUALIZATION", dimX, dimY)
 
 	demoWorld.PrintASCIIVisualization()
+
+	fmt.Println("\n=== TESTING VEHICLE MOVEMENT ===")
+
+	vehicleManager := movement.NewVehicleLifecycleManager(demoWorld.Grid, demoWorld.Vehicles)
+
+	for step := 0; step < 10; step++ {
+		fmt.Printf("\n--- Simulation Step %d ---\n", step+1)
+
+		vehicleManager.UpdateAllVehicles(0.5)
+
+		activeVehicles := vehicleManager.GetActiveVehicles()
+		fmt.Printf("Active vehicles: %d\n", len(activeVehicles))
+
+		for _, vehicle := range activeVehicles {
+    if vehicle.CurrentSegment != nil && vehicle.CurrentCell != nil && vehicle.DestinationCell != nil {
+        fmt.Printf("  %s: (%.1f,%.1f) -> (%.1f,%.1f) Speed: %.1f km/h Fuel: %.1fL\n",
+            vehicle.ID,
+            float64(vehicle.CurrentCell.Xpos), float64(vehicle.CurrentCell.Ypos),
+            float64(vehicle.DestinationCell.Xpos), float64(vehicle.DestinationCell.Ypos),
+            vehicle.CurrentSpeedKPH, vehicle.FuelLevel)
+    } else {
+        fmt.Printf("  %s: incomplete vehicle state (missing cell or destination)\n", vehicle.ID)
+    }
+}
+
+		if step%10 == 0 {
+			fmt.Printf("\nGrid at step %d:\n", step+1)
+			vehicleManager.PrintCurrentState()
+		}
+
+		// Break if all vehicles reached destination
+		if len(activeVehicles) == 0 {
+			fmt.Println("All vehicles reached their destinations!")
+			break
+		}
+
+		time.Sleep(100 * time.Millisecond) // Small delay for readability
+	}
 
 	fmt.Println("WEEK 1 MILESTONE COMPLETED")
 

@@ -41,8 +41,8 @@ type RoadSegment struct {
 	EndX   int64 `json:"end_x"`
 	EndY   int64 `json:"end_y"`
 
-	LengthKM float64 `json:"length_km"` 
-	BaseSpeedKPH float64 `json:"base_speed_kph"` 
+	LengthKM     float64 `json:"length_km"`
+	BaseSpeedKPH float64 `json:"base_speed_kph"`
 
 	SpeedLimit *int64 `json:"speed_limit,omitempty"`
 	Capacity   *int64 `json:"capacity,omitempty"`

@@ -142,8 +142,6 @@ func (vs *VehicleSpawner) findValidSpawnLocations(grid *domainmodels.Grid) []*do
 	return validLocations
 }
 
-
-
 func (vs *VehicleSpawner) getConnectionDirection(dx, dy int64) string {
 	if dx > 0 {
 		return "east"
@@ -191,8 +189,8 @@ func (vs *VehicleSpawner) createVehicle(vehicleType string, spawnLocation *domai
 		Profile: *profile,
 		Status:  constants.VehicleStatusIdle,
 
-		CurrentCell:     spawnLocation,
-		OriginCell:      spawnLocation,
+		CurrentCell: spawnLocation,
+		OriginCell:  spawnLocation,
 		// Progress:        0.0,
 		CurrentSpeedKPH: 0.0,
 
@@ -201,7 +199,6 @@ func (vs *VehicleSpawner) createVehicle(vehicleType string, spawnLocation *domai
 		ProximityLOD:    false,
 
 		SpawnedAt: &[]time.Time{time.Now()}[0],
-		
 	}
 
 	return vehicle

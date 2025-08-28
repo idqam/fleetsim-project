@@ -9,6 +9,20 @@ type Grid struct {
 	SegmentIndex map[int64]*Cell    `json:"-"` // segmentID → *Cell
 	RoadGraph    *RoadGraph         `json:"-"` // adjacency of road network
 }
+type GraphNode struct {
+	ID       int64  `json:"id"`
+	StartX   int64  `json:"start_x"`
+	StartY   int64  `json:"start_y"`
+	EndX     int64  `json:"end_x"`
+	EndY     int64  `json:"end_y"`
+	Capacity *int64 `json:"capacity,omitempty"`
+	IsOpen   bool   `json:"is_open"`
+}
+
+type GraphEdge struct {
+	From int64 `json:"from"`
+	To   int64 `json:"to"`
+}
 type CellType string
 
 const (
@@ -92,17 +106,20 @@ func (g *Grid) GetGraphEdges() []GraphEdge {
 	return edges
 }
 
-type GraphNode struct {
-	ID       int64  `json:"id"`
-	StartX   int64  `json:"start_x"`
-	StartY   int64  `json:"start_y"`
-	EndX     int64  `json:"end_x"`
-	EndY     int64  `json:"end_y"`
-	Capacity *int64 `json:"capacity,omitempty"`
-	IsOpen   bool   `json:"is_open"`
+func (segment *RoadSegment) AddVehicle() {
+	segment.CurrentTrafficLoad.VehicleCount++
+	if segment.Capacity != nil {
+		segment.CurrentTrafficLoad.CapacityUtilization =
+			float64(segment.CurrentTrafficLoad.VehicleCount) / float64(*segment.Capacity)
+	}
 }
 
-type GraphEdge struct {
-	From int64 `json:"from"`
-	To   int64 `json:"to"`
+func (segment *RoadSegment) RemoveVehicle() {
+	if segment.CurrentTrafficLoad.VehicleCount > 0 {
+		segment.CurrentTrafficLoad.VehicleCount--
+		if segment.Capacity != nil {
+			segment.CurrentTrafficLoad.CapacityUtilization =
+				float64(segment.CurrentTrafficLoad.VehicleCount) / float64(*segment.Capacity)
+		}
+	}
 }

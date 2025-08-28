@@ -7,38 +7,37 @@ import (
 	"owenvi.com/fleetsim/internal/domainmodels"
 	"owenvi.com/fleetsim/internal/utils"
 )
+
 func (gl *GridLoader) placeSpecialLocations(grid *domainmodels.Grid, rng *rand.Rand) error {
-    fmt.Printf("Placing special locations (%.1f%% fuel, %.1f%% depot)...\n",
-        gl.RefuelCellsAllotment*100, gl.DepotCellsAllotment*100)
+	fmt.Printf("Placing special locations (%.1f%% fuel, %.1f%% depot)...\n",
+		gl.RefuelCellsAllotment*100, gl.DepotCellsAllotment*100)
 
-    eligibleCells := gl.findEligibleCells(grid)
-    if len(eligibleCells) == 0 {
-        return fmt.Errorf("no eligible cells found for special location placement")
-    }
+	eligibleCells := gl.findEligibleCells(grid)
+	if len(eligibleCells) == 0 {
+		return fmt.Errorf("no eligible cells found for special location placement")
+	}
 
-    totalCells := len(grid.Cells)
-    fuelStationsNeeded := int(float64(totalCells) * gl.RefuelCellsAllotment)
-    depotsNeeded := int(float64(totalCells) * gl.DepotCellsAllotment)
+	totalCells := len(grid.Cells)
+	fuelStationsNeeded := int(float64(totalCells) * gl.RefuelCellsAllotment)
+	depotsNeeded := int(float64(totalCells) * gl.DepotCellsAllotment)
 
-    fmt.Printf("Creating %d fuel stations, %d depots from %d eligible cells\n",
-        fuelStationsNeeded, depotsNeeded, len(eligibleCells))
+	fmt.Printf("Creating %d fuel stations, %d depots from %d eligible cells\n",
+		fuelStationsNeeded, depotsNeeded, len(eligibleCells))
 
-    if err := gl.placeFuelStations(grid, eligibleCells, fuelStationsNeeded, rng); err != nil {
-        return fmt.Errorf("fuel station placement failed: %w", err)
-    }
+	if err := gl.placeFuelStations(grid, eligibleCells, fuelStationsNeeded, rng); err != nil {
+		return fmt.Errorf("fuel station placement failed: %w", err)
+	}
 
-    if err := gl.placeDepots(grid, eligibleCells, depotsNeeded, rng); err != nil {
-        return fmt.Errorf("depot placement failed: %w", err)
-    }
+	if err := gl.placeDepots(grid, eligibleCells, depotsNeeded, rng); err != nil {
+		return fmt.Errorf("depot placement failed: %w", err)
+	}
 
-    if err := gl.validatePostPlacementConnectivity(grid); err != nil {
-        return fmt.Errorf("special location placement broke network connectivity: %w", err)
-    }
+	if err := gl.validatePostPlacementConnectivity(grid); err != nil {
+		return fmt.Errorf("special location placement broke network connectivity: %w", err)
+	}
 
-    return nil
+	return nil
 }
-
-
 
 func (gl *GridLoader) findEligibleCells(grid *domainmodels.Grid) []*domainmodels.Cell {
 	var eligible []*domainmodels.Cell
@@ -61,7 +60,6 @@ func (gl *GridLoader) findEligibleCells(grid *domainmodels.Grid) []*domainmodels
 
 	return eligible
 }
-
 
 func (gl *GridLoader) isCellStrategicallyEligible(grid *domainmodels.Grid, cell *domainmodels.Cell) bool {
 
@@ -176,11 +174,10 @@ func (gl *GridLoader) hasGoodDepotSpacing(grid *domainmodels.Grid, candidate *do
 	return true
 }
 
-
 func (gl *GridLoader) placeBlockedAreas(grid *domainmodels.Grid, eligibleCells []*domainmodels.Cell, count int, rng *rand.Rand) error {
 	placed := 0
 	undoStack := []undoOp{}
-	dsu := buildDSU(grid) 
+	dsu := buildDSU(grid)
 
 	candidates := shuffledCandidates(eligibleCells, rng)
 
@@ -196,7 +193,6 @@ func (gl *GridLoader) placeBlockedAreas(grid *domainmodels.Grid, eligibleCells [
 			continue
 		}
 
-		
 		cellIndex := int(candidate.Ypos*gl.Width + candidate.Xpos)
 		undo := undoOp{
 			cellIndex: cellIndex,
@@ -204,12 +200,11 @@ func (gl *GridLoader) placeBlockedAreas(grid *domainmodels.Grid, eligibleCells [
 			prevSegs:  append([]domainmodels.CellRoad{}, candidate.RoadSegments...),
 		}
 
-		
 		candidate.CellType = domainmodels.CellTypeBlocked
 		candidate.RoadSegments = []domainmodels.CellRoad{}
 
 		if !gl.quickConnectivityCheck(dsu, grid) {
-			
+
 			grid.Cells[undo.cellIndex].CellType = undo.prevType
 			grid.Cells[undo.cellIndex].RoadSegments = undo.prevSegs
 			continue

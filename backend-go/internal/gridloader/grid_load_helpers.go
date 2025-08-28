@@ -289,49 +289,48 @@ func (gl *GridLoader) restoreCellStateFromBackup(grid *domainmodels.Grid, backup
 	fmt.Printf("Restored %d cells to their backed-up state\n", restoredCount)
 }
 func (gl *GridLoader) placeSpecialLocationsHybrid(grid *domainmodels.Grid, rng *rand.Rand) error {
-    _, _, _ = gl.calculateSafeParameters(grid) 
+	_, _, _ = gl.calculateSafeParameters(grid)
 
-    originalRefuel := gl.RefuelCellsAllotment
-    originalDepot := gl.DepotCellsAllotment
-    maxAttempts := 10
+	originalRefuel := gl.RefuelCellsAllotment
+	originalDepot := gl.DepotCellsAllotment
+	maxAttempts := 10
 
-    for attempt := 0; attempt < maxAttempts; attempt++ {
-        var targetRefuel, targetDepot float64
+	for attempt := 0; attempt < maxAttempts; attempt++ {
+		var targetRefuel, targetDepot float64
 
-        if attempt == 0 {
-            targetRefuel = originalRefuel
-            targetDepot = originalDepot
-            fmt.Printf("Attempt 1: Trying optimistic parameters (refuel=%.3f, depot=%.3f)\n",
-                targetRefuel, targetDepot)
-        } else {
-            aggressiveness := 1.0 - (float64(attempt-1) * 0.3)
-            targetRefuel = originalRefuel * (0.9 + aggressiveness*0.1)
-            targetDepot = originalDepot * (0.9 + aggressiveness*0.1)
-            fmt.Printf("Attempt %d: Trying conservative parameters (refuel=%.3f, depot=%.3f)\n",
-                attempt+1, targetRefuel, targetDepot)
-        }
+		if attempt == 0 {
+			targetRefuel = originalRefuel
+			targetDepot = originalDepot
+			fmt.Printf("Attempt 1: Trying optimistic parameters (refuel=%.3f, depot=%.3f)\n",
+				targetRefuel, targetDepot)
+		} else {
+			aggressiveness := 1.0 - (float64(attempt-1) * 0.3)
+			targetRefuel = originalRefuel * (0.9 + aggressiveness*0.1)
+			targetDepot = originalDepot * (0.9 + aggressiveness*0.1)
+			fmt.Printf("Attempt %d: Trying conservative parameters (refuel=%.3f, depot=%.3f)\n",
+				attempt+1, targetRefuel, targetDepot)
+		}
 
-        gl.RefuelCellsAllotment = targetRefuel
-        gl.DepotCellsAllotment = targetDepot
+		gl.RefuelCellsAllotment = targetRefuel
+		gl.DepotCellsAllotment = targetDepot
 
-        cellBackup := gl.createCellStateBackup(grid)
+		cellBackup := gl.createCellStateBackup(grid)
 
-        err := gl.placeSpecialLocations(grid, rng)
-        if err == nil {
-            gl.RefuelCellsAllotment = originalRefuel
-            gl.DepotCellsAllotment = originalDepot
-            fmt.Printf("Hybrid placement succeeded on attempt %d\n", attempt+1)
-            return nil
-        }
+		err := gl.placeSpecialLocations(grid, rng)
+		if err == nil {
+			gl.RefuelCellsAllotment = originalRefuel
+			gl.DepotCellsAllotment = originalDepot
+			fmt.Printf("Hybrid placement succeeded on attempt %d\n", attempt+1)
+			return nil
+		}
 
-        gl.restoreCellStateFromBackup(grid, cellBackup)
-    }
+		gl.restoreCellStateFromBackup(grid, cellBackup)
+	}
 
-    gl.RefuelCellsAllotment = originalRefuel
-    gl.DepotCellsAllotment = originalDepot
-    return fmt.Errorf("hybrid placement failed after %d attempts", maxAttempts)
+	gl.RefuelCellsAllotment = originalRefuel
+	gl.DepotCellsAllotment = originalDepot
+	return fmt.Errorf("hybrid placement failed after %d attempts", maxAttempts)
 }
-
 
 func (gl *GridLoader) countRoadCells(grid *domainmodels.Grid) int {
 	roadCellCount := 0
@@ -569,26 +568,26 @@ func (gl *GridLoader) initializeEmptyGrid() *domainmodels.Grid {
 }
 
 func (gl *GridLoader) generateRoadNetwork(grid *domainmodels.Grid, rng *rand.Rand) error {
-    fmt.Printf("Generating road network with density %.2f...\n", gl.RoadDensity)
+	fmt.Printf("Generating road network with density %.2f...\n", gl.RoadDensity)
 
-    mainArteriesCreated := gl.createMainArteries(grid, rng)
-    secondaryRoadsCreated := gl.createSecondaryRoads(grid, rng)
+	mainArteriesCreated := gl.createMainArteries(grid, rng)
+	secondaryRoadsCreated := gl.createSecondaryRoads(grid, rng)
 
-    if gl.BlockedCellsAllotment > 0 {
-        fmt.Println("Placing blocked areas before final connectivity fill...")
-        _ = gl.placeBlockedAreas(grid, gl.findEligibleCells(grid),
-            int(float64(len(grid.Cells))*gl.BlockedCellsAllotment), rng)
-    }
+	if gl.BlockedCellsAllotment > 0 {
+		fmt.Println("Placing blocked areas before final connectivity fill...")
+		_ = gl.placeBlockedAreas(grid, gl.findEligibleCells(grid),
+			int(float64(len(grid.Cells))*gl.BlockedCellsAllotment), rng)
+	}
 
-    connectivityRoadsCreated := gl.fillConnectivityGaps(grid, rng)
+	connectivityRoadsCreated := gl.fillConnectivityGaps(grid, rng)
 
-    gl.GenerationStatsSu.MainArteries = mainArteriesCreated
-    gl.GenerationStatsSu.SecondaryRoads = secondaryRoadsCreated
+	gl.GenerationStatsSu.MainArteries = mainArteriesCreated
+	gl.GenerationStatsSu.SecondaryRoads = secondaryRoadsCreated
 
-    fmt.Printf("Created %d main arteries, %d secondary roads, %d connectivity segments\n",
-        mainArteriesCreated, secondaryRoadsCreated, connectivityRoadsCreated)
+	fmt.Printf("Created %d main arteries, %d secondary roads, %d connectivity segments\n",
+		mainArteriesCreated, secondaryRoadsCreated, connectivityRoadsCreated)
 
-    return nil
+	return nil
 }
 
 func (gl *GridLoader) createMainArteries(grid *domainmodels.Grid, rng *rand.Rand) int {
@@ -821,11 +820,10 @@ func (gl *GridLoader) createConnectionSegment(grid *domainmodels.Grid, fromX, fr
 		EndY:     toY,
 		LengthKM: gl.calculateSegmentLength(fromX, fromY, toX, toY),
 
-		BaseSpeedKPH: gl.getBaseSpeedForSegment(fromX, fromY, toX, toY), 
-		IsOpen:   true,
-		Capacity: gl.getDefaultCapacityForSegment(),
+		BaseSpeedKPH: gl.getBaseSpeedForSegment(fromX, fromY, toX, toY),
+		IsOpen:       true,
+		Capacity:     gl.getDefaultCapacityForSegment(),
 	}
-
 
 	gl.addSegmentToCell(grid, fromX, fromY, segment)
 	gl.addSegmentToCell(grid, toX, toY, segment)
@@ -834,11 +832,11 @@ func (gl *GridLoader) createConnectionSegment(grid *domainmodels.Grid, fromX, fr
 	return true
 }
 func (gl *GridLoader) getBaseSpeedForSegment(fromX, fromY, toX, toY int64) float64 {
-    if fromX == toX || fromY == toY {
-        return 50.0 
-    }
-    
-    return 30.0 
+	if fromX == toX || fromY == toY {
+		return 50.0
+	}
+
+	return 30.0
 }
 
 func (gl *GridLoader) fillConnectivityGaps(grid *domainmodels.Grid, rng *rand.Rand) int {
@@ -895,8 +893,6 @@ func (gl *GridLoader) addRandomConnection(grid *domainmodels.Grid, cell *domainm
 
 	return false
 }
-
-
 
 func (gl *GridLoader) addSegmentToCell(grid *domainmodels.Grid, x, y int64, segment domainmodels.RoadSegment) {
 	cell := utils.GetCellAtGrid(grid, x, y)
@@ -980,7 +976,7 @@ func (gl *GridLoader) buildGridBasedAdjacencyOptimized(grid *domainmodels.Grid) 
 
 			for _, currentSegmentID := range currentSegments {
 				if adjacency[currentSegmentID] == nil {
-					adjacency[currentSegmentID] = make([]int64, 0, 8) 
+					adjacency[currentSegmentID] = make([]int64, 0, 8)
 				}
 
 				adjacency[currentSegmentID] = append(adjacency[currentSegmentID], neighborSegments...)

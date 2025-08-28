@@ -6,13 +6,11 @@ import (
 	"owenvi.com/fleetsim/internal/domainmodels"
 )
 
-
 type undoOp struct {
 	cellIndex int
 	prevType  domainmodels.CellType
 	prevSegs  []domainmodels.CellRoad
 }
-
 
 type DSU struct {
 	parent map[int64]int64
@@ -35,7 +33,6 @@ func (d *DSU) union(x, y int64) {
 		d.parent[px] = py
 	}
 }
-
 
 func buildDSU(grid *domainmodels.Grid) *DSU {
 	d := newDSU()
@@ -69,7 +66,7 @@ func shuffledCandidates(cells []*domainmodels.Cell, rng *rand.Rand) []*domainmod
 }
 
 func (gl *GridLoader) quickConnectivityCheck(dsu *DSU, grid *domainmodels.Grid) bool {
-	
+
 	visited := make(map[int64]bool)
 	components := 0
 	for segID := range dsu.parent {
